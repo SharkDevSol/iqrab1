@@ -1051,10 +1051,21 @@ router.post('/bulk-import', async (req, res) => {
     });
     
     // Validate all classes exist
+    const missingClasses = [];
     for (const cls of Object.keys(studentsByClass)) {
       if (!availableClasses.includes(cls)) {
-        throw new Error(`Class "${cls}" does not exist. Please create it first.`);
+        missingClasses.push(cls);
       }
+    }
+    
+    if (missingClasses.length > 0) {
+      await client.query('ROLLBACK');
+      return res.status(400).json({ 
+        error: `The following classes do not exist: ${missingClasses.join(', ')}. Please create them first at the "Create Form Structure" page.`,
+        missingClasses,
+        availableClasses,
+        hint: 'Go to Tasks > Create Form Structure to add these classes before importing students.'
+      });
     }
     
     // Get class_id counters for each class
