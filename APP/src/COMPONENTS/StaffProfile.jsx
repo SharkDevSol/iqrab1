@@ -1052,7 +1052,8 @@ const StaffProfile = () => {
 
   const fetchFaultClasses = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/faults/classes`, getAuthConfig());
+      // Use the same endpoint as student list to get proper class names
+      const response = await axios.get(`${API_BASE_URL}/student-list/classes`);
       const classes = Array.isArray(response.data) ? response.data : [];
       setFaultClasses(classes);
       // Don't auto-select first class - let user choose
