@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="cache-control" content="no-cache, no-store, must-revalidate, max-age=0">
+    <meta http-equiv="pragma" content="no-cache">
+    <meta http-equiv="expires" content="0">
+    <title>Force Clear Cache - Skoolific</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .container {
+            text-align: center;
+            padding: 3rem;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 24px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            max-width: 600px;
+            width: 90%;
+        }
+        
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        h2 {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .spinner {
+            border: 6px solid rgba(255, 255, 255, 0.2);
+            border-top: 6px solid white;
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            animation: spin 1s linear infinite;
+            margin: 2rem auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .steps {
+            text-align: left;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+        }
+        
+        .steps li {
+            margin: 0.75rem 0;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+        
+        .status {
+            margin-top: 1.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+        
+        .success {
+            color: #4ade80;
+        }
+        
+        .button {
+            margin-top: 2rem;
+            padding: 1rem 2rem;
+            background: white;
+            color: #667eea;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄</h1>
+        <h2>Force Clear Cache</h2>
+        <div class="spinner"></div>
+        
+        <div class="steps">
+            <strong>Clearing:</strong>
+            <ul>
+                <li id="step1">✓ Browser cache</li>
+                <li id="step2">✓ Service workers</li>
+                <li id="step3">✓ Local storage (keeping auth)</li>
+                <li id="step4">✓ Session storage</li>
+                <li id="step5">✓ IndexedDB</li>
+            </ul>
+        </div>
+        
+        <div class="status" id="status">Clearing all caches...</div>
+        
+        <button class="button" id="reloadBtn" style="display: none;" onclick="window.location.href='/?t=' + Date.now()">
+            Go to Homepage
+        </button>
+    </div>
+    
+    <script>
+        const statusEl = document.getElementById('status');
+        const reloadBtn = document.getElementById('reloadBtn');
+        
+        async function clearEverything() {
+            try {
+                // 1. Clear all caches
+                if ('caches' in window) {
+                    const cacheNames = await caches.keys();
+                    await Promise.all(cacheNames.map(name => caches.delete(name)));
+                    console.log('✓ Cleared', cacheNames.length, 'caches');
+                }
+                
+                // 2. Unregister all service workers
+                if ('serviceWorker' in navigator) {
+                    const registrations = await navigator.serviceWorker.getRegistrations();
+                    await Promise.all(registrations.map(reg => reg.unregister()));
+                    console.log('✓ Unregistered', registrations.length, 'service workers');
+                }
+                
+                // 3. Clear storage (preserve auth)
+                const authData = {
+                    authToken: localStorage.getItem('authToken'),
+                    token: localStorage.getItem('token'),
+                    isLoggedIn: localStorage.getItem('isLoggedIn'),
+                    adminUser: localStorage.getItem('adminUser'),
+                    staffUser: localStorage.getItem('staffUser'),
+                    staffProfile: localStorage.getItem('staffProfile'),
+                    guardianInfo: localStorage.getItem('guardianInfo'),
+                    studentInfo: localStorage.getItem('studentInfo'),
+                    userType: localStorage.getItem('userType'),
+                    userPermissions: localStorage.getItem('userPermissions')
+                };
+                
+                localStorage.clear();
+                sessionStorage.clear();
+                
+                // Restore auth data
+                Object.keys(authData).forEach(key => {
+                    if (authData[key]) localStorage.setItem(key, authData[key]);
+                });
+                
+                console.log('✓ Cleared storage (kept auth)');
+                
+                // 4. Clear IndexedDB
+                if (window.indexedDB) {
+                    const dbs = await window.indexedDB.databases();
+                    dbs.forEach(db => {
+                        window.indexedDB.deleteDatabase(db.name);
+                    });
+                    console.log('✓ Cleared IndexedDB');
+                }
+                
+                statusEl.innerHTML = '<span class="success">✓ All caches cleared successfully!</span>';
+                statusEl.innerHTML += '<br><small>Redirecting in 2 seconds...</small>';
+                
+                // Auto redirect after 2 seconds
+                setTimeout(() => {
+                    window.location.href = '/?t=' + Date.now();
+                }, 2000);
+                
+                // Show manual button
+                reloadBtn.style.display = 'inline-block';
+                
+            } catch (error) {
+                console.error('Error clearing cache:', error);
+                statusEl.innerHTML = '⚠️ Some caches cleared. Please do a hard refresh (Ctrl+Shift+R)';
+                reloadBtn.style.display = 'inline-block';
+            }
+        }
+        
+        // Start clearing immediately
+        clearEverything();
+    </script>
+</body>
+</html>
