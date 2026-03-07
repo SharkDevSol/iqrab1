@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FiUser, FiClipboard, FiFileText, FiMessageSquare, FiEye, FiBriefcase, FiUserCheck, FiCalendar, FiCheck, FiX, FiClock, FiSave, FiArrowLeft, FiBook, FiBarChart2, FiAlertCircle, FiEdit, FiEdit2, FiList, FiSearch, FiUsers, FiSettings, FiSend, FiStar } from 'react-icons/fi';
+import { FiUser, FiClipboard, FiFileText, FiMessageSquare, FiEye, FiBriefcase, FiUserCheck, FiCalendar, FiCheck, FiX, FiClock, FiSave, FiArrowLeft, FiBook, FiBarChart2, FiAlertCircle, FiEdit, FiEdit2, FiList, FiSearch, FiUsers, FiSettings, FiSend, FiStar, FiCheckCircle, FiXCircle } from 'react-icons/fi';
 import axios from 'axios';
 import TeacherCommunications from '../PAGE/Communication/TeacherCommunications';
 import StudentAttendanceSystem from '../PAGE/Academic/StudentAttendanceSystem';
