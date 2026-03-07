@@ -225,8 +225,8 @@ const StaffProfile = () => {
       // Check evaluation book assignments for this teacher
       fetchEvalBookAssignments(profileData.global_staff_id);
       
-      // Fetch classes for faults system
-      fetchFaultClasses();
+      // Fetch classes for faults system - pass profileData since state hasn't updated yet
+      fetchFaultClassesForTeacher(profileData.name);
     } catch (error) {
       navigate('/app/staff-login');
       return;
@@ -1050,18 +1050,30 @@ const StaffProfile = () => {
     };
   };
 
-  const fetchFaultClasses = async () => {
+  const fetchFaultClasses = async (teacherName) => {
     try {
-      // Use the same endpoint as student list to get proper class names
-      const response = await axios.get(`${API_BASE_URL}/student-list/classes`);
-      const classes = Array.isArray(response.data) ? response.data : [];
+      // Get teacher's assigned classes from class-communication endpoint
+      if (!teacherName) {
+        console.log('No teacher name provided');
+        return;
+      }
+      
+      const response = await axios.get(`${API_BASE_URL}/class-communication/teacher-classes/${encodeURIComponent(teacherName)}`);
+      const classes = Array.isArray(response.data.classes) ? response.data.classes : [];
       setFaultClasses(classes);
+      
+      console.log(`✅ Loaded ${classes.length} classes for teacher ${teacherName}:`, classes);
       // Don't auto-select first class - let user choose
     } catch (error) {
       console.error('Error fetching fault classes:', error);
       setFaultClasses([]); // Set empty array on error
       // Don't show error toast on initial load - it's not critical
     }
+  };
+
+  // Wrapper function for backward compatibility
+  const fetchFaultClassesForTeacher = (teacherName) => {
+    fetchFaultClasses(teacherName);
   };
 
   const fetchFaultStudents = async (className) => {
