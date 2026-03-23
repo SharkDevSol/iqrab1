@@ -752,7 +752,7 @@ const StaffProfile = () => {
           fetchWeeklyAttendance(className, currentWeekMonday);
         } catch (createErr) {
           // Creation failed — fall back to latest existing week
-          console.error('Auto-create week failed:', createErr);
+          console.error('Auto-create week failed:', createErr?.response?.data || createErr);
           if (response.data.length > 0) {
             const latestWeek = response.data[0].replace('week_', '').replace(/_/g, '-');
             setSelectedWeek(latestWeek);

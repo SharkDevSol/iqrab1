@@ -538,12 +538,19 @@ router.post('/create-weekly-attendance', async (req, res) => {
       )
     `);
 
+    // Check if is_active column exists in this class table
+    const colCheck = await client.query(`
+      SELECT column_name FROM information_schema.columns
+      WHERE table_schema = 'classes_schema' AND table_name = $1 AND column_name = 'is_active'
+    `, [className]);
+    const hasIsActive = colCheck.rows.length > 0;
+
     // Fetch students and populate the table - filter out students with null IDs
     const studentsResult = await client.query(`
       SELECT school_id, class_id, student_name
       FROM classes_schema."${className}"
       WHERE school_id IS NOT NULL AND class_id IS NOT NULL AND student_name IS NOT NULL
-        AND (is_active = TRUE OR is_active IS NULL)
+        ${hasIsActive ? "AND (is_active = TRUE OR is_active IS NULL)" : ""}
       ORDER BY LOWER(student_name) ASC
     `);
 
