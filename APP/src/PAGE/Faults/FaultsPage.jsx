@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { FiAlertCircle, FiUser, FiCalendar, FiFilter, FiDownload, FiSearch, FiBarChart2, FiTrendingUp, FiUsers, FiFileText } from 'react-icons/fi';
+import { FiAlertCircle, FiUser, FiCalendar, FiFilter, FiDownload, FiSearch, FiBarChart2, FiTrendingUp, FiUsers, FiFileText, FiPlus, FiX, FiSave } from 'react-icons/fi';
 import axios from 'axios';
 import styles from './FaultsPage.module.css';
 
@@ -20,6 +20,23 @@ const FaultsPage = () => {
     recentFaults: 0
   });
 
+  // Add Fault Modal state
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [addForm, setAddForm] = useState({
+    className: '',
+    student_name: '',
+    fault_type: 'Late Arrival',
+    fault_level: 'Minor',
+    description: '',
+    date: new Date().toISOString().split('T')[0]
+  });
+  const [modalStudents, setModalStudents] = useState([]);
+  const [submitting, setSubmitting] = useState(false);
+  const [addError, setAddError] = useState('');
+
+  const faultTypes = ['Late Arrival', 'Fight', 'Disrespect', 'Absence', 'Skipped Class', 'Uniform Violation', 'Other'];
+  const faultLevels = ['Minor', 'Moderate', 'Serious', 'Severe'];
+
   const getAuthConfig = () => {
     const token = localStorage.getItem('authToken') || localStorage.getItem('token');
     return {
@@ -27,6 +44,51 @@ const FaultsPage = () => {
         Authorization: `Bearer ${token}`
       }
     };
+  };
+
+  // Fetch students when modal class changes
+  const fetchModalStudents = async (className) => {
+    if (!className) return setModalStudents([]);
+    try {
+      const res = await axios.get(`${API_BASE_URL}/faults/students/${className}`, getAuthConfig());
+      setModalStudents(Array.isArray(res.data) ? res.data : []);
+    } catch {
+      setModalStudents([]);
+    }
+  };
+
+  const handleAddFormClassChange = (className) => {
+    setAddForm(f => ({ ...f, className, student_name: '' }));
+    fetchModalStudents(className);
+  };
+
+  const handleSubmitFault = async (e) => {
+    e.preventDefault();
+    setAddError('');
+    if (!addForm.className || !addForm.student_name || !addForm.description) {
+      setAddError('Please fill in all required fields');
+      return;
+    }
+    try {
+      setSubmitting(true);
+      const formData = new FormData();
+      formData.append('className', addForm.className);
+      formData.append('student_name', addForm.student_name);
+      formData.append('fault_type', addForm.fault_type);
+      formData.append('fault_level', addForm.fault_level);
+      formData.append('date', addForm.date);
+      formData.append('description', addForm.description);
+      formData.append('reported_by', 'Admin');
+      await axios.post(`${API_BASE_URL}/faults/add-fault`, formData, getAuthConfig());
+      setShowAddModal(false);
+      setAddForm({ className: '', student_name: '', fault_type: 'Late Arrival', fault_level: 'Minor', description: '', date: new Date().toISOString().split('T')[0] });
+      setModalStudents([]);
+      fetchAllFaults();
+    } catch (err) {
+      setAddError(err.response?.data?.error || 'Failed to add fault');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   useEffect(() => {
@@ -190,6 +252,7 @@ const FaultsPage = () => {
   const groupedFaults = groupFaultsByStudent(filteredFaults);
 
   return (
+    <>
     <div className={styles.container}>
       <div className={styles.header}>
         <div className={styles.headerContent}>
@@ -200,6 +263,9 @@ const FaultsPage = () => {
         </div>
         <button className={styles.exportButton} onClick={exportToCSV}>
           <FiDownload /> Export Report
+        </button>
+        <button className={styles.addFaultButton} onClick={() => setShowAddModal(true)}>
+          <FiPlus /> Add Fault
         </button>
       </div>
 
@@ -371,6 +437,84 @@ const FaultsPage = () => {
         )}
       </div>
     </div>
+
+      {/* Add Fault Modal */}
+      {showAddModal && (
+        <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:1000, display:'flex', alignItems:'center', justifyContent:'center', padding:'1rem' }}
+          onClick={() => setShowAddModal(false)}>
+          <div style={{ background:'white', borderRadius:'20px', padding:'2rem', width:'100%', maxWidth:'500px', maxHeight:'90vh', overflowY:'auto' }}
+            onClick={e => e.stopPropagation()}>
+            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'1.5rem' }}>
+              <h2 style={{ margin:0, fontSize:'1.25rem', fontWeight:700, color:'#1f2937' }}><FiAlertCircle style={{ marginRight:'0.5rem' }}/>Add Fault</h2>
+              <button onClick={() => setShowAddModal(false)} style={{ background:'none', border:'none', cursor:'pointer', color:'#6b7280', fontSize:'1.25rem' }}><FiX /></button>
+            </div>
+
+            {addError && <div style={{ background:'#fee2e2', color:'#991b1b', padding:'0.75rem 1rem', borderRadius:'10px', marginBottom:'1rem', fontSize:'0.875rem' }}>{addError}</div>}
+
+            <form onSubmit={handleSubmitFault} style={{ display:'flex', flexDirection:'column', gap:'1rem' }}>
+              <div>
+                <label style={{ display:'block', fontSize:'0.875rem', fontWeight:600, color:'#374151', marginBottom:'0.4rem' }}>Class *</label>
+                <select value={addForm.className} onChange={e => handleAddFormClassChange(e.target.value)}
+                  style={{ width:'100%', padding:'0.75rem', border:'2px solid #e5e7eb', borderRadius:'10px', fontSize:'0.9375rem' }} required>
+                  <option value="">Select class...</option>
+                  {classes.map(cls => <option key={cls} value={cls}>{cls}</option>)}
+                </select>
+              </div>
+
+              <div>
+                <label style={{ display:'block', fontSize:'0.875rem', fontWeight:600, color:'#374151', marginBottom:'0.4rem' }}>Student *</label>
+                <select value={addForm.student_name} onChange={e => setAddForm(f => ({ ...f, student_name: e.target.value }))}
+                  style={{ width:'100%', padding:'0.75rem', border:'2px solid #e5e7eb', borderRadius:'10px', fontSize:'0.9375rem' }} required disabled={!addForm.className}>
+                  <option value="">Select student...</option>
+                  {modalStudents.map(s => <option key={s.school_id} value={s.student_name}>{s.student_name}</option>)}
+                </select>
+              </div>
+
+              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'1rem' }}>
+                <div>
+                  <label style={{ display:'block', fontSize:'0.875rem', fontWeight:600, color:'#374151', marginBottom:'0.4rem' }}>Fault Type *</label>
+                  <select value={addForm.fault_type} onChange={e => setAddForm(f => ({ ...f, fault_type: e.target.value }))}
+                    style={{ width:'100%', padding:'0.75rem', border:'2px solid #e5e7eb', borderRadius:'10px', fontSize:'0.9375rem' }}>
+                    {faultTypes.map(t => <option key={t} value={t}>{t}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label style={{ display:'block', fontSize:'0.875rem', fontWeight:600, color:'#374151', marginBottom:'0.4rem' }}>Level *</label>
+                  <select value={addForm.fault_level} onChange={e => setAddForm(f => ({ ...f, fault_level: e.target.value }))}
+                    style={{ width:'100%', padding:'0.75rem', border:'2px solid #e5e7eb', borderRadius:'10px', fontSize:'0.9375rem' }}>
+                    {faultLevels.map(l => <option key={l} value={l}>{l}</option>)}
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label style={{ display:'block', fontSize:'0.875rem', fontWeight:600, color:'#374151', marginBottom:'0.4rem' }}>Date *</label>
+                <input type="date" value={addForm.date} onChange={e => setAddForm(f => ({ ...f, date: e.target.value }))}
+                  style={{ width:'100%', padding:'0.75rem', border:'2px solid #e5e7eb', borderRadius:'10px', fontSize:'0.9375rem', boxSizing:'border-box' }} required />
+              </div>
+
+              <div>
+                <label style={{ display:'block', fontSize:'0.875rem', fontWeight:600, color:'#374151', marginBottom:'0.4rem' }}>Description *</label>
+                <textarea value={addForm.description} onChange={e => setAddForm(f => ({ ...f, description: e.target.value }))}
+                  rows={3} placeholder="Describe the fault..."
+                  style={{ width:'100%', padding:'0.75rem', border:'2px solid #e5e7eb', borderRadius:'10px', fontSize:'0.9375rem', resize:'vertical', boxSizing:'border-box' }} required />
+              </div>
+
+              <div style={{ display:'flex', gap:'0.75rem', marginTop:'0.5rem' }}>
+                <button type="button" onClick={() => setShowAddModal(false)}
+                  style={{ flex:1, padding:'0.875rem', border:'2px solid #e5e7eb', borderRadius:'12px', background:'white', color:'#374151', fontWeight:600, cursor:'pointer', fontSize:'0.9375rem' }}>
+                  Cancel
+                </button>
+                <button type="submit" disabled={submitting}
+                  style={{ flex:1, padding:'0.875rem', border:'none', borderRadius:'12px', background:'linear-gradient(135deg,#667eea,#764ba2)', color:'white', fontWeight:600, cursor:'pointer', fontSize:'0.9375rem', display:'flex', alignItems:'center', justifyContent:'center', gap:'0.5rem' }}>
+                  <FiSave /> {submitting ? 'Saving...' : 'Save Fault'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 
