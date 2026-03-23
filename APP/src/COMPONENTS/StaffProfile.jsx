@@ -2285,77 +2285,53 @@ const StaffProfile = () => {
           </div>
         </div>
 
-        {/* Quick Stats Cards */}
-        <div className={styles.statsGrid}>
-          <div className={styles.statCard}>
-            <div className={styles.statIcon} style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
-              <FiUsers size={16} />
+        {/* Quick Stats Cards - compact row */}
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:'0.4rem', marginBottom:'0.75rem' }}>
+          {[
+            { label:'Total', value: students.length, bg:'linear-gradient(135deg,#667eea,#764ba2)', icon:<FiUsers size={14}/> },
+            { label:'Present', value: Object.values(attendanceRecords).filter(r=>r[selectedDay]==='P').length, bg:'linear-gradient(135deg,#f093fb,#f5576c)', icon:<FiCheckCircle size={14}/> },
+            { label:'Late', value: Object.values(attendanceRecords).filter(r=>r[selectedDay]==='L').length, bg:'linear-gradient(135deg,#4facfe,#00f2fe)', icon:<FiClock size={14}/> },
+            { label:'Absent', value: Object.values(attendanceRecords).filter(r=>r[selectedDay]==='A').length, bg:'linear-gradient(135deg,#fa709a,#fee140)', icon:<FiXCircle size={14}/> },
+          ].map(s => (
+            <div key={s.label} style={{ background:'white', borderRadius:'12px', padding:'0.5rem 0.3rem', display:'flex', flexDirection:'column', alignItems:'center', gap:'0.2rem', boxShadow:'0 2px 8px rgba(0,0,0,0.07)' }}>
+              <div style={{ width:'28px', height:'28px', borderRadius:'8px', background:s.bg, display:'flex', alignItems:'center', justifyContent:'center', color:'white' }}>{s.icon}</div>
+              <span style={{ fontSize:'0.58rem', color:'#64748b', fontWeight:600, textTransform:'uppercase', letterSpacing:'0.3px' }}>{s.label}</span>
+              <span style={{ fontSize:'1.2rem', fontWeight:700, color:'#1e293b', lineHeight:1 }}>{s.value}</span>
             </div>
-            <div className={styles.statContent}>
-              <span className={styles.statLabel}>Total</span>
-              <span className={styles.statValue}>{students.length}</span>
-            </div>
-          </div>
-          <div className={styles.statCard}>
-            <div className={styles.statIcon} style={{ background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' }}>
-              <FiCheckCircle size={16} />
-            </div>
-            <div className={styles.statContent}>
-              <span className={styles.statLabel}>Present</span>
-              <span className={styles.statValue}>
-                {Object.values(attendanceRecords).filter(r => r[selectedDay] === 'P').length}
-              </span>
-            </div>
-          </div>
-          <div className={styles.statCard}>
-            <div className={styles.statIcon} style={{ background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' }}>
-              <FiClock size={16} />
-            </div>
-            <div className={styles.statContent}>
-              <span className={styles.statLabel}>Late</span>
-              <span className={styles.statValue}>
-                {Object.values(attendanceRecords).filter(r => r[selectedDay] === 'L').length}
-              </span>
-            </div>
-          </div>
-          <div className={styles.statCard}>
-            <div className={styles.statIcon} style={{ background: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)' }}>
-              <FiXCircle size={16} />
-            </div>
-            <div className={styles.statContent}>
-              <span className={styles.statLabel}>Absent</span>
-              <span className={styles.statValue}>
-                {Object.values(attendanceRecords).filter(r => r[selectedDay] === 'A').length}
-              </span>
-            </div>
-          </div>
+          ))}
         </div>
 
         {/* Day selector + Mark All + Save */}
-        <div className={styles.attendanceToolbar}>
-          <div className={styles.daySelector}>
+        <div style={{ background:'white', borderRadius:'14px', padding:'0.6rem 0.75rem', marginBottom:'0.75rem', boxShadow:'0 2px 8px rgba(0,0,0,0.06)' }}>
+          <div style={{ display:'flex', gap:'0.25rem', marginBottom:'0.5rem' }}>
             {schoolDays.map(day => (
               <button
                 key={day}
-                className={`${styles.dayBtn} ${selectedDay === day ? styles.dayBtnActive : ''}`}
                 onClick={() => setSelectedDay(day)}
+                style={{
+                  flex:1, padding:'0.35rem 0.2rem', borderRadius:'10px', border: selectedDay===day ? 'none' : '1.5px solid #e0e0e0',
+                  background: selectedDay===day ? 'linear-gradient(135deg,#667eea,#764ba2)' : '#f8f9fa',
+                  color: selectedDay===day ? 'white' : '#666', fontWeight:600, fontSize:'0.7rem',
+                  cursor:'pointer', display:'flex', flexDirection:'column', alignItems:'center', gap:'0.1rem', transition:'all 0.2s'
+                }}
               >
-                <span>{day.charAt(0).toUpperCase() + day.slice(1, 3)}</span>
+                <span>{day.charAt(0).toUpperCase() + day.slice(1,3)}</span>
                 {weekEthiopianDates[day] && (
-                  <span className={styles.dayBtnEthDate}>{formatEthiopianShort(weekEthiopianDates[day])}</span>
+                  <span style={{ fontSize:'0.55rem', opacity:0.85 }}>{formatEthiopianShort(weekEthiopianDates[day])}</span>
                 )}
               </button>
             ))}
           </div>
-          <div className={styles.toolbarActions}>
-            <button className={styles.markAllBtn} onClick={() => markAllAs('P')}>All Present</button>
+          <div style={{ display:'flex', gap:'0.5rem' }}>
+            <button className={styles.markAllBtn} style={{ flex:1, fontSize:'0.78rem', padding:'0.4rem' }} onClick={() => markAllAs('P')}>All Present</button>
             {anyUnsaved && (
               <button
                 className={styles.saveAllBtn}
+                style={{ flex:1, fontSize:'0.78rem', padding:'0.4rem' }}
                 onClick={saveAttendance}
                 disabled={savingAttendance}
               >
-                <FiSave size={14} />
+                <FiSave size={13} />
                 {savingAttendance ? 'Saving...' : 'Save'}
               </button>
             )}
