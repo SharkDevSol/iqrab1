@@ -2289,16 +2289,16 @@ const StaffProfile = () => {
         <div className={styles.statsGrid}>
           <div className={styles.statCard}>
             <div className={styles.statIcon} style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
-              <FiUsers size={20} />
+              <FiUsers size={16} />
             </div>
             <div className={styles.statContent}>
-              <span className={styles.statLabel}>Total Students</span>
+              <span className={styles.statLabel}>Total</span>
               <span className={styles.statValue}>{students.length}</span>
             </div>
           </div>
           <div className={styles.statCard}>
             <div className={styles.statIcon} style={{ background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' }}>
-              <FiCheckCircle size={20} />
+              <FiCheckCircle size={16} />
             </div>
             <div className={styles.statContent}>
               <span className={styles.statLabel}>Present</span>
@@ -2309,7 +2309,7 @@ const StaffProfile = () => {
           </div>
           <div className={styles.statCard}>
             <div className={styles.statIcon} style={{ background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' }}>
-              <FiClock size={20} />
+              <FiClock size={16} />
             </div>
             <div className={styles.statContent}>
               <span className={styles.statLabel}>Late</span>
@@ -2320,7 +2320,7 @@ const StaffProfile = () => {
           </div>
           <div className={styles.statCard}>
             <div className={styles.statIcon} style={{ background: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)' }}>
-              <FiXCircle size={20} />
+              <FiXCircle size={16} />
             </div>
             <div className={styles.statContent}>
               <span className={styles.statLabel}>Absent</span>

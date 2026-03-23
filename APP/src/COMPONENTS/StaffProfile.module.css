@@ -4697,24 +4697,71 @@
   }
 
   .statsGrid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.75rem;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.4rem;
+    margin-bottom: 0.75rem;
   }
 
   .statCard {
-    padding: 1rem;
+    padding: 0.5rem 0.4rem;
     flex-direction: column;
-    align-items: flex-start;
-    gap: 0.75rem;
+    align-items: center;
+    gap: 0.2rem;
+    border-radius: 10px;
+    text-align: center;
   }
 
   .statIcon {
-    width: 40px;
-    height: 40px;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+  }
+
+  .statContent {
+    gap: 0.1rem;
+  }
+
+  .statLabel {
+    font-size: 0.6rem;
+    letter-spacing: 0;
   }
 
   .statValue {
-    font-size: 1.5rem;
+    font-size: 1.1rem;
+  }
+
+  .attendanceToolbar {
+    padding: 0.5rem 0.75rem;
+    margin: 0 0 0.75rem;
+    gap: 0.5rem;
+  }
+
+  .daySelector {
+    gap: 0.25rem;
+    width: 100%;
+  }
+
+  .dayBtn {
+    flex: 1;
+    padding: 0.35rem 0.25rem;
+    font-size: 0.7rem;
+    border-radius: 10px;
+  }
+
+  .dayBtnEthDate {
+    font-size: 0.55rem;
+  }
+
+  .toolbarActions {
+    width: 100%;
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .markAllBtn, .saveAllBtn {
+    flex: 1;
+    font-size: 0.75rem;
+    padding: 0.4rem 0.5rem;
   }
 
   .studentsSection {
