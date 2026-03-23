@@ -2008,7 +2008,7 @@ const StaffProfile = () => {
                     <FiUsers style={{ color: '#e67e22' }} />
                   </div>
                   <div className={styles.markListStatInfo}>
-                    <div className={styles.markListStatValue}>{classAverage ? `${classAverage}%` : ''}</div>
+                    <div className={styles.markListStatValue}>{classAverage && parseFloat(classAverage) > 0 ? `${classAverage}%` : ''}</div>
                     <div className={styles.markListStatLabel}>Average</div>
                   </div>
                 </div>
@@ -2126,7 +2126,7 @@ const StaffProfile = () => {
                         </div>
                         <div className={styles.markListStudentTotal}>
                           <div className={styles.markListTotalLabel}>Total</div>
-                          <div className={styles.markListTotalValue}>{student.total ? `${student.total}%` : ''}</div>
+                          <div className={styles.markListTotalValue}>{parseFloat(student.total) > 0 ? `${student.total}%` : ''}</div>
                         </div>
                       </div>
 
@@ -2140,7 +2140,7 @@ const StaffProfile = () => {
                                 type="number"
                                 min="0"
                                 max={component.percentage}
-                                value={student[componentKey] === 0 || student[componentKey] ? student[componentKey] : ''}
+                                value={student[componentKey] === '' ? '' : (student[componentKey] === 0 || student[componentKey] === '0' || student[componentKey] === '0.00' || parseFloat(student[componentKey]) === 0) ? '' : student[componentKey]}
                                 onChange={(e) => handleMarkListMarkChange(student.id, componentKey, e.target.value)}
                                 placeholder=""
                                 disabled={isLocked}
