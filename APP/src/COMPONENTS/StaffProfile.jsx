@@ -2286,16 +2286,16 @@ const StaffProfile = () => {
         </div>
 
         {/* Quick Stats Cards - compact row */}
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:'0.4rem', marginBottom:'0.75rem' }}>
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:'0.4rem', marginBottom:'0.75rem', width:'100%' }}>
           {[
             { label:'Total', value: students.length, bg:'linear-gradient(135deg,#667eea,#764ba2)', icon:<FiUsers size={14}/> },
             { label:'Present', value: Object.values(attendanceRecords).filter(r=>r[selectedDay]==='P').length, bg:'linear-gradient(135deg,#f093fb,#f5576c)', icon:<FiCheckCircle size={14}/> },
             { label:'Late', value: Object.values(attendanceRecords).filter(r=>r[selectedDay]==='L').length, bg:'linear-gradient(135deg,#4facfe,#00f2fe)', icon:<FiClock size={14}/> },
             { label:'Absent', value: Object.values(attendanceRecords).filter(r=>r[selectedDay]==='A').length, bg:'linear-gradient(135deg,#fa709a,#fee140)', icon:<FiXCircle size={14}/> },
           ].map(s => (
-            <div key={s.label} style={{ background:'white', borderRadius:'12px', padding:'0.5rem 0.3rem', display:'flex', flexDirection:'column', alignItems:'center', gap:'0.2rem', boxShadow:'0 2px 8px rgba(0,0,0,0.07)' }}>
-              <div style={{ width:'28px', height:'28px', borderRadius:'8px', background:s.bg, display:'flex', alignItems:'center', justifyContent:'center', color:'white' }}>{s.icon}</div>
-              <span style={{ fontSize:'0.58rem', color:'#64748b', fontWeight:600, textTransform:'uppercase', letterSpacing:'0.3px' }}>{s.label}</span>
+            <div key={s.label} style={{ background:'white', borderRadius:'12px', padding:'0.5rem 0.3rem', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:'0.2rem', boxShadow:'0 2px 8px rgba(0,0,0,0.07)', minWidth:0 }}>
+              <div style={{ width:'30px', height:'30px', borderRadius:'8px', background:s.bg, display:'flex', alignItems:'center', justifyContent:'center', color:'white', flexShrink:0 }}>{s.icon}</div>
+              <span style={{ fontSize:'0.58rem', color:'#64748b', fontWeight:600, textTransform:'uppercase', letterSpacing:'0.3px', textAlign:'center' }}>{s.label}</span>
               <span style={{ fontSize:'1.2rem', fontWeight:700, color:'#1e293b', lineHeight:1 }}>{s.value}</span>
             </div>
           ))}
