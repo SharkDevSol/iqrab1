@@ -2231,7 +2231,7 @@ const StaffProfile = () => {
     if (status === 'P') return <span className={styles.statusIconP}>✓</span>;
     if (status === 'A') return <span className={styles.statusIconA}>✗</span>;
     if (status === 'L') return <span className={styles.statusIconL}>◐</span>;
-    if (status === 'E') return <span className={styles.statusIconE}>E</span>;
+    if (status === 'E') return <span className={styles.statusIconE}>F</span>;
     return <span className={styles.statusIconEmpty}>-</span>;
   };
 
@@ -2414,7 +2414,7 @@ const StaffProfile = () => {
                       <button
                         className={`${styles.markBtn} ${styles.markBtnE} ${status === 'E' ? styles.markBtnActive : ''}`}
                         onClick={() => markStudent(student, status === 'E' ? '' : 'E')}
-                      >E</button>
+                      >F</button>
                     </div>
                   </div>
                 );
