@@ -9,36 +9,12 @@ export default defineConfig({
     dedupe: ['react', 'react-dom'],
   },
   build: {
-    chunkSizeWarningLimit: 2500,
+    chunkSizeWarningLimit: 6000,
     rollupOptions: {
       output: {
-        manualChunks(id) {
-          // Core React - must be single instance
-          if (id.includes('node_modules/react/') || id.includes('node_modules/react-dom/') || id.includes('node_modules/react-router-dom/')) {
-            return 'vendor-react';
-          }
-          // Axios
-          if (id.includes('node_modules/axios')) return 'vendor-axios';
-          // Icons
-          if (id.includes('node_modules/react-icons')) return 'vendor-icons';
-          // Framer motion
-          if (id.includes('node_modules/framer-motion')) return 'vendor-motion';
-          // Ant Design + Charts together (same React instance)
-          if (id.includes('node_modules/antd') || id.includes('node_modules/@ant-design')) return 'vendor-antd';
-          // Recharts
-          if (id.includes('node_modules/recharts')) return 'vendor-antd';
-          // Date libraries
-          if (id.includes('node_modules/dayjs') || id.includes('node_modules/moment')) return 'vendor-date';
-          // PDF/export
-          if (id.includes('node_modules/jspdf') || id.includes('node_modules/xlsx') || id.includes('node_modules/html2canvas')) return 'vendor-export';
-          // Guardian pages
-          if (id.includes('/src/Guardian/')) return 'pages-guardian';
-          // Staff pages
-          if (id.includes('/src/Staff/') || id.includes('/src/PAGE/HR')) return 'pages-staff';
-          // Finance pages
-          if (id.includes('/src/PAGE/Finance')) return 'pages-finance';
-          // Academic pages
-          if (id.includes('/src/PAGE/Academic') || id.includes('/src/PAGE/CreateMarklist') || id.includes('/src/PAGE/MarkListView')) return 'pages-academic';
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+          'vendor-axios': ['axios'],
         }
       }
     }
