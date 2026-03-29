@@ -20,8 +20,8 @@ export default defineConfig({
           if (id.includes('node_modules/react-icons')) return 'vendor-icons';
           // Framer motion
           if (id.includes('node_modules/framer-motion')) return 'vendor-motion';
-          // Charts
-          if (id.includes('node_modules/recharts') || id.includes('node_modules/@ant-design/charts')) return 'vendor-charts';
+          // Charts - merge with antd to avoid version conflict
+          if (id.includes('node_modules/recharts') || id.includes('node_modules/@ant-design/charts') || id.includes('node_modules/@ant-design/plots')) return 'vendor-antd';
           // Ant Design
           if (id.includes('node_modules/antd') || id.includes('node_modules/@ant-design')) return 'vendor-antd';
           // Date libraries
