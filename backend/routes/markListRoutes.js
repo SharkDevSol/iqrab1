@@ -370,7 +370,7 @@ router.post('/create-mark-forms', async (req, res) => {
     
     // Create schema for the subject if it doesn't exist
     // Replace spaces, hyphens, and other special characters with underscores
-    const schemaName = `subject_${subjectName.toLowerCase().replace(/[\s\-]+/g, '_')}_schema`;
+    const schemaName = `subject_${subjectName.toLowerCase().replace(/[\s\-\.]+/g, '_')}_schema`;
     await client.query(`CREATE SCHEMA IF NOT EXISTS ${schemaName}`);
     
     // Create table name for the specific class and term
@@ -385,7 +385,7 @@ router.post('/create-mark-forms', async (req, res) => {
     ];
     
     const markColumns = markComponents.map(component => 
-      `${component.name.toLowerCase().replace(/[\s\-]+/g, '_')} DECIMAL(5,2) DEFAULT 0`
+      `${component.name.toLowerCase().replace(/[\s\-\.]+/g, '_')} DECIMAL(5,2) DEFAULT 0`
     );
     
     const additionalColumns = [
@@ -475,7 +475,7 @@ router.get('/mark-list/:subjectName/:className/:termNumber', async (req, res) =>
   
   const client = await pool.connect();
   try {
-    const schemaName = `subject_${subjectName.toLowerCase().replace(/[\s\-]+/g, '_')}_schema`;
+    const schemaName = `subject_${subjectName.toLowerCase().replace(/[\s\-\.]+/g, '_')}_schema`;
     const tableName = `${className.toLowerCase()}_term_${termNumber}`;
     
     // Check if is_active column exists
@@ -571,7 +571,7 @@ router.put('/update-marks', async (req, res) => {
   try {
     await client.query('BEGIN');
     
-    const schemaName = `subject_${subjectName.toLowerCase().replace(/[\s\-]+/g, '_')}_schema`;
+    const schemaName = `subject_${subjectName.toLowerCase().replace(/[\s\-\.]+/g, '_')}_schema`;
     const tableName = `${className.toLowerCase()}_term_${termNumber}`;
     
     // Get form configuration to validate marks
@@ -593,7 +593,7 @@ router.put('/update-marks', async (req, res) => {
     let total = 0;
     
     for (const component of markComponents) {
-      const componentKey = component.name.toLowerCase().replace(/[\s\-]+/g, '_');
+      const componentKey = component.name.toLowerCase().replace(/[\s\-\.]+/g, '_');
       if (marks[componentKey] !== undefined) {
         const mark = parseFloat(marks[componentKey]);
         const maxMark = component.percentage;
@@ -712,7 +712,7 @@ router.get('/ranking/:className/:termNumber', async (req, res) => {
     
     for (const subject of subjects) {
       const subjectName = subject.subject_name;
-      const schemaName = `subject_${subjectName.toLowerCase().replace(/[\s\-]+/g, '_')}_schema`;
+      const schemaName = `subject_${subjectName.toLowerCase().replace(/[\s\-\.]+/g, '_')}_schema`;
       const tableName = `${className.toLowerCase()}_term_${termNumber}`;
       
       try {
@@ -827,7 +827,7 @@ router.get('/teacher-mark-lists/:teacherName', async (req, res) => {
         console.log(`Processing: ${subjectName} Class ${className}`);
         
         // Check which terms have mark list forms
-        const schemaName = `subject_${subjectName.toLowerCase().replace(/[\s\-]+/g, '_')}_schema`;
+        const schemaName = `subject_${subjectName.toLowerCase().replace(/[\s\-\.]+/g, '_')}_schema`;
         
         for (let term = 1; term <= termCount; term++) {
           const tableName = `${className.toLowerCase()}_term_${term}`;
@@ -887,7 +887,7 @@ router.post('/calculate-totals', async (req, res) => {
   try {
     await client.query('BEGIN');
     
-    const schemaName = `subject_${subjectName.toLowerCase().replace(/[\s\-]+/g, '_')}_schema`;
+    const schemaName = `subject_${subjectName.toLowerCase().replace(/[\s\-\.]+/g, '_')}_schema`;
     const tableName = `${className.toLowerCase()}_term_${termNumber}`;
     
     // Get form configuration
@@ -910,7 +910,7 @@ router.post('/calculate-totals', async (req, res) => {
       // Calculate total for this student
       let total = 0;
       const componentColumns = markComponents.map(comp => 
-        comp.name.toLowerCase().replace(/[\s\-]+/g, '_')
+        comp.name.toLowerCase().replace(/[\s\-\.]+/g, '_')
       );
       
       const studentDataResult = await client.query(
@@ -922,7 +922,7 @@ router.post('/calculate-totals', async (req, res) => {
         const studentData = studentDataResult.rows[0];
         
         markComponents.forEach(component => {
-          const componentKey = component.name.toLowerCase().replace(/[\s\-]+/g, '_');
+          const componentKey = component.name.toLowerCase().replace(/[\s\-\.]+/g, '_');
           const mark = parseFloat(studentData[componentKey]) || 0;
           const maxMark = component.percentage;
           total += Math.min(mark, maxMark);
@@ -983,7 +983,7 @@ router.get('/comprehensive-ranking/:className/:termNumber', async (req, res) => 
     // Get marks from each subject
     for (const subject of subjects) {
       const subjectName = subject.subject_name;
-      const schemaName = `subject_${subjectName.toLowerCase().replace(/[\s\-]+/g, '_')}_schema`;
+      const schemaName = `subject_${subjectName.toLowerCase().replace(/[\s\-\.]+/g, '_')}_schema`;
       const tableName = `${className.toLowerCase()}_term_${termNumber}`;
       
       try {
@@ -1104,7 +1104,7 @@ router.get('/statistics/:subjectName/:className/:termNumber', async (req, res) =
   const { subjectName, className, termNumber } = req.params;
   
   try {
-    const schemaName = `subject_${subjectName.toLowerCase().replace(/[\s\-]+/g, '_')}_schema`;
+    const schemaName = `subject_${subjectName.toLowerCase().replace(/[\s\-\.]+/g, '_')}_schema`;
     const tableName = `${className.toLowerCase()}_term_${termNumber}`;
     
     // Get all marks
@@ -1188,7 +1188,7 @@ router.post('/bulk-update-marks', async (req, res) => {
   try {
     await client.query('BEGIN');
     
-    const schemaName = `subject_${subjectName.toLowerCase().replace(/[\s\-]+/g, '_')}_schema`;
+    const schemaName = `subject_${subjectName.toLowerCase().replace(/[\s\-\.]+/g, '_')}_schema`;
     const tableName = `${className.toLowerCase()}_term_${termNumber}`;
     
     // Get form configuration
@@ -1230,7 +1230,7 @@ router.post('/bulk-update-marks', async (req, res) => {
       let total = 0;
       
       for (const component of markComponents) {
-        const componentKey = component.name.toLowerCase().replace(/[\s\-]+/g, '_');
+        const componentKey = component.name.toLowerCase().replace(/[\s\-\.]+/g, '_');
         if (marks[componentKey] !== undefined) {
           const mark = parseFloat(marks[componentKey]);
           const maxMark = component.percentage;
@@ -1449,11 +1449,11 @@ router.get('/student-marks/:schoolId/:className', async (req, res) => {
     
     for (const subjectRow of subjectsResult.rows) {
       const subjectName = subjectRow.subject_name;
-      const schemaName = `subject_${subjectName.toLowerCase().replace(/[\s\-]+/g, '_')}_schema`;
+      const schemaName = `subject_${subjectName.toLowerCase().replace(/[\s\-\.]+/g, '_')}_schema`;
       
       // Check all terms (1-4)
       for (let term = 1; term <= 4; term++) {
-        const tableName = `${className.toLowerCase().replace(/[\s\-]+/g, '_')}_term_${term}`;
+        const tableName = `${className.toLowerCase().replace(/[\s\-\.]+/g, '_')}_term_${term}`;
         
         try {
           // Check if table exists and get student's marks by student_name
@@ -1474,7 +1474,7 @@ router.get('/student-marks/:schoolId/:className', async (req, res) => {
             const components = [];
             if (configResult.rows.length > 0 && configResult.rows[0].mark_components) {
               for (const comp of configResult.rows[0].mark_components) {
-                const compKey = comp.name.toLowerCase().replace(/[\s\-]+/g, '_');
+                const compKey = comp.name.toLowerCase().replace(/[\s\-\.]+/g, '_');
                 components.push({
                   name: comp.name,
                   score: studentData[compKey] || 0,
@@ -1544,7 +1544,7 @@ router.post('/sync-class-students/:className', async (req, res) => {
     // For each subject-class combination
     for (const mapping of subjectMappingsResult.rows) {
       const subjectName = mapping.subject_name;
-      const schemaName = `subject_${subjectName.toLowerCase().replace(/[\s\-]+/g, '_')}_schema`;
+      const schemaName = `subject_${subjectName.toLowerCase().replace(/[\s\-\.]+/g, '_')}_schema`;
       
       // For each term
       for (let term = 1; term <= termCount; term++) {
@@ -1707,7 +1707,7 @@ router.get('/guardian-marks/:guardianUsername', async (req, res) => {
     
     for (const ward of wards) {
       for (const subjectName of subjects) {
-        const schemaName = `subject_${subjectName.toLowerCase().replace(/[\s\-]+/g, '_')}_schema`;
+        const schemaName = `subject_${subjectName.toLowerCase().replace(/[\s\-\.]+/g, '_')}_schema`;
         
         for (let term = 1; term <= termCount; term++) {
           const tableName = `${ward.class.toLowerCase()}_term_${term}`;
@@ -1766,3 +1766,5 @@ router.get('/guardian-marks/:guardianUsername', async (req, res) => {
 });
 
 module.exports = router;
+
+
