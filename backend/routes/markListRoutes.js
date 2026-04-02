@@ -350,15 +350,16 @@ router.post('/create-mark-forms', async (req, res) => {
   try {
     await client.query('BEGIN');
     
-    // Validate class exists in classes_schema
+    // Validate class exists in classes_schema (case-insensitive)
     const classResult = await client.query(
       `SELECT table_name FROM information_schema.tables 
-       WHERE table_schema = 'classes_schema' AND table_name = $1`,
+       WHERE table_schema = 'classes_schema' AND LOWER(table_name) = LOWER($1)`,
       [className]
     );
     if (classResult.rows.length === 0) {
       throw new Error(`Class ${className} not found in classes_schema`);
     }
+    const actualClassName = classResult.rows[0].table_name;
     
     // Validate subject exists
     const subjectResult = await client.query(
@@ -409,7 +410,7 @@ router.post('/create-mark-forms', async (req, res) => {
       WHERE table_schema = 'classes_schema' 
         AND table_name = $1 
         AND column_name = 'is_active'
-    `, [className]);
+    `, [actualClassName]);
     
     const hasIsActive = columnCheck.rows.length > 0;
     const whereClause = hasIsActive ? 'WHERE is_active = TRUE OR is_active IS NULL' : '';
@@ -417,7 +418,7 @@ router.post('/create-mark-forms', async (req, res) => {
     // Get students from the class table in classes_schema (only active students)
     const studentsResult = await client.query(`
       SELECT student_name, age, gender 
-      FROM classes_schema."${className}" 
+      FROM classes_schema."${actualClassName}" 
       ${whereClause}
     `);
     
