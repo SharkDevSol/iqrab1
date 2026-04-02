@@ -2155,56 +2155,39 @@ const StaffProfile = () => {
                     const isAdmin = user?.staffType?.toLowerCase() === 'admin';
                     const isLocked = savedMarkStudents.has(student.id) && !isAdmin;
                     return (
-                    <div key={student.id} className={`${styles.markListStudentCard} ${isLocked ? styles.markListStudentLocked : ''}`}>
-                      <div className={styles.markListStudentHeader}>
-                        <div className={styles.markListStudentInfo}>
-                          <div className={styles.markListStudentNumber}>{idx + 1}</div>
-                          <div>
-                            <h3 className={styles.markListStudentName}>{student.student_name}</h3>
-                            <p className={styles.markListStudentMeta}>{student.gender} • Age {student.age}</p>
-                          </div>
+                    <div key={student.id} className={`${styles.mlCard} ${isLocked ? styles.markListStudentLocked : ''}`}>
+                      {/* Row: avatar + name + inputs + save */}
+                      <div className={styles.mlRow}>
+                        <div className={styles.mlAvatar}>{student.student_name?.charAt(0)}</div>
+                        <div className={styles.mlName}>
+                          <span>{student.student_name}</span>
+                          {parseFloat(student.total) > 0 && <span className={styles.mlTotal}>{student.total}%</span>}
                         </div>
-                        <div className={styles.markListStudentTotal}>
-                          <div className={styles.markListTotalLabel}>Total</div>
-                          <div className={styles.markListTotalValue}>{parseFloat(student.total) > 0 ? `${student.total}%` : ''}</div>
-                        </div>
-                      </div>
-
-                      <div className={styles.markListScoresGrid}>
-                        {markListConfig.mark_components.map(component => {
-                          const componentKey = component.name.toLowerCase().replace(/\s+/g, '_');
-                          return (
-                            <div key={component.name} className={styles.markListScoreItem}>
-                              <label>{component.name} ({component.percentage}%)</label>
-                              <input
-                                type="number"
-                                min="0"
-                                max={component.percentage}
-                                value={student[componentKey] === '' ? '' : (student[componentKey] === 0 || student[componentKey] === '0' || student[componentKey] === '0.00' || parseFloat(student[componentKey]) === 0) ? '' : student[componentKey]}
-                                onChange={(e) => handleMarkListMarkChange(student.id, componentKey, e.target.value)}
-                                placeholder=""
-                                disabled={isLocked}
-                              />
-                            </div>
-                          );
-                        })}
-                      </div>
-
-                      <div className={styles.markListStudentFooter}>
-                        <div className={`${styles.markListStatusBadge} ${student.pass_status === 'Pass' ? styles.markListStatusPass : styles.markListStatusFail}`}>
-                          {student.pass_status === 'Pass' ? <><FiCheck /> Passed</> : <><FiX /> Failed</>}
+                        <div className={styles.mlInputs}>
+                          {markListConfig.mark_components.map(component => {
+                            const componentKey = component.name.toLowerCase().replace(/\s+/g, '_');
+                            return (
+                              <div key={component.name} className={styles.mlInputWrap}>
+                                <span className={styles.mlLabel}>{component.name}</span>
+                                <input
+                                  type="number"
+                                  min="0"
+                                  max={component.percentage}
+                                  value={student[componentKey] === '' ? '' : (parseFloat(student[componentKey]) === 0) ? '' : student[componentKey]}
+                                  onChange={(e) => handleMarkListMarkChange(student.id, componentKey, e.target.value)}
+                                  placeholder="0"
+                                  disabled={isLocked}
+                                  className={styles.mlInput}
+                                />
+                              </div>
+                            );
+                          })}
                         </div>
                         {isLocked ? (
-                          <span className={styles.markListLockedBadge}>
-                            <FiCheckCircle size={14} /> Saved
-                          </span>
+                          <span className={styles.mlSaved}><FiCheckCircle size={16} /></span>
                         ) : (
-                          <button
-                            className={styles.markListSaveBtn}
-                            onClick={() => saveStudentMarks(student.id)}
-                            disabled={savingMarks}
-                          >
-                            <FiSave /> Save
+                          <button className={styles.mlSaveBtn} onClick={() => saveStudentMarks(student.id)} disabled={savingMarks}>
+                            <FiSave size={15} />
                           </button>
                         )}
                       </div>
