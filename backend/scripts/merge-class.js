@@ -32,22 +32,27 @@ async function run() {
     const colNames = cols.rows.map(c => c.column_name);
     console.log('\nTarget columns:', colNames.join(', '));
 
-    // Insert each source student into target (only matching columns)
+    // Insert each source student into target with new IDs
     let moved = 0;
     for (const student of src.rows) {
-      const insertCols = colNames.filter(c => student[c] !== undefined);
-      const values = insertCols.map(c => student[c]);
-      const placeholders = insertCols.map((_, i) => `$${i + 1}`).join(', ');
+      // Get next available id in target
+      const maxId = await db.query(`SELECT MAX(id) as max_id FROM classes_schema."${TARGET}"`);
+      const nextId = (maxId.rows[0].max_id || 0) + 1;
+
+      const insertCols = colNames.filter(c => c !== 'id' && student[c] !== undefined);
+      const values = [nextId, ...insertCols.map(c => student[c])];
+      const allCols = ['id', ...insertCols];
+      const placeholders = allCols.map((_, i) => `$${i + 1}`).join(', ');
       
       try {
         await db.query(
-          `INSERT INTO classes_schema."${TARGET}" (${insertCols.map(c => `"${c}"`).join(', ')}) VALUES (${placeholders})`,
+          `INSERT INTO classes_schema."${TARGET}" (${allCols.map(c => `"${c}"`).join(', ')}) VALUES (${placeholders})`,
           values
         );
         moved++;
-        console.log(`  Moved: ${student.student_name}`);
+        console.log(`  Moved: ${student.student_name} (new id: ${nextId})`);
       } catch (e) {
-        console.log(`  Skip (duplicate?): ${student.student_name} - ${e.message}`);
+        console.log(`  Skip: ${student.student_name} - ${e.message}`);
       }
     }
 
