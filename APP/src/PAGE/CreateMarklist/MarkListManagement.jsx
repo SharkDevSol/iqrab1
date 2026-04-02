@@ -16,9 +16,10 @@ const MarkListForm = () => {
   const [selectedClass, setSelectedClass] = useState('');
   const [selectedTerm, setSelectedTerm] = useState(1);
   const [markComponents, setMarkComponents] = useState([
-    { name: 'Test 1', percentage: 20 },
-    { name: 'Test 2', percentage: 30 },
-    { name: 'Quiz', percentage: 10 },
+    { name: 'Mid', percentage: 20 },
+    { name: 'Test', percentage: 20 },
+    { name: 'Conduct', percentage: 10 },
+    { name: 'Exercise', percentage: 10 },
     { name: 'Final', percentage: 40 }
   ]);
   const [markList, setMarkList] = useState([]);
