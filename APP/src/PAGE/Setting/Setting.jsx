@@ -4,6 +4,8 @@ import styles from './Setting.module.css';
 import { useApp } from '../../context/AppContext';
 import { FiUser, FiLock, FiGlobe, FiSun, FiImage, FiSave, FiCheck, FiX, FiCamera, FiUpload, FiHome, FiSmartphone, FiDownload, FiShare2, FiCopy } from 'react-icons/fi';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL?.replace('/api', '') || 'https://iqrab1.skoolific.com';
+
 const Setting = () => {
   const { theme, updateTheme, language, updateLanguage, profile, updateProfile, websiteName, updateWebsiteName, t } = useApp();
   
@@ -383,7 +385,7 @@ const Setting = () => {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
         
-        const logoUrl = `https://bilal.skoolific.com${response.data.logoUrl}`;
+        const logoUrl = `${API_BASE_URL}${response.data.logoUrl}`;
         setSchoolLogo(response.data.logo);
         setSchoolLogoUrl(logoUrl);
         
@@ -410,7 +412,7 @@ const Setting = () => {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
         
-        const iconUrl = `https://bilal.skoolific.com${response.data.iconUrl}`;
+        const iconUrl = `${API_BASE_URL}${response.data.iconUrl}`;
         setWebIcon(response.data.icon);
         setWebIconUrl(iconUrl);
         

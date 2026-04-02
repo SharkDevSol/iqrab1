@@ -11,7 +11,7 @@ import StaffForm from './StaffForm';
 import { useApp } from '../../../context/AppContext';
 
 // API base URL - use environment variable or fallback to localhost
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://bilal.skoolific.com/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://iqrab1.skoolific.com/api';
 
 const CreateRegisterStaff = () => {
   const { t } = useApp();

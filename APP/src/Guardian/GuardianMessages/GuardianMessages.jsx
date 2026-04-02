@@ -27,7 +27,7 @@ const GuardianMessages = () => {
 
   useEffect(() => {
     // Initialize Socket.IO
-    socketRef.current = io('https://bilal.skoolific.com');
+    socketRef.current = io('https://iqrab1.skoolific.com');
     socketRef.current.emit('join', currentUserId);
 
     // Listen for new messages
@@ -47,7 +47,7 @@ const GuardianMessages = () => {
 
   const fetchConversations = async () => {
     try {
-      const res = await axios.get(`https://bilal.skoolific.com/api/chats/conversations?userId=${currentUserId}`);
+      const res = await axios.get(`https://iqrab1.skoolific.com/api/chats/conversations?userId=${currentUserId}`);
       setConversations(res.data.map(c => ({ ...c, currentUserId })));
     } catch (error) {
       console.error('Error fetching conversations:', error);
@@ -61,8 +61,8 @@ const GuardianMessages = () => {
     try {
       // Fetch both teachers and admins
       const [teachersRes, adminsRes] = await Promise.all([
-        axios.get('https://bilal.skoolific.com/api/chats/contacts/teachers'),
-        axios.get('https://bilal.skoolific.com/api/chats/contacts/admins').catch(() => ({ data: [] }))
+        axios.get('https://iqrab1.skoolific.com/api/chats/contacts/teachers'),
+        axios.get('https://iqrab1.skoolific.com/api/chats/contacts/admins').catch(() => ({ data: [] }))
       ]);
       
       const allContacts = [
@@ -81,11 +81,11 @@ const GuardianMessages = () => {
   const fetchMessages = async (conversationId) => {
     setMessagesLoading(true);
     try {
-      const res = await axios.get(`https://bilal.skoolific.com/api/chats/conversations/${conversationId}/messages`);
+      const res = await axios.get(`https://iqrab1.skoolific.com/api/chats/conversations/${conversationId}/messages`);
       setMessages(res.data);
       
       // Mark as read
-      await axios.put('https://bilal.skoolific.com/api/chats/messages/read', {
+      await axios.put('https://iqrab1.skoolific.com/api/chats/messages/read', {
         conversationId,
         userId: currentUserId
       });
@@ -111,7 +111,7 @@ const GuardianMessages = () => {
   const handleSendMessage = async (formData) => {
     try {
       const res = await axios.post(
-        `https://bilal.skoolific.com/api/chats/conversations/${activeConversation.id}/messages`,
+        `https://iqrab1.skoolific.com/api/chats/conversations/${activeConversation.id}/messages`,
         formData,
         { headers: { 'Content-Type': 'multipart/form-data' } }
       );
@@ -141,7 +141,7 @@ const GuardianMessages = () => {
 
   const handleStartConversation = async (contact) => {
     try {
-      const res = await axios.post('https://bilal.skoolific.com/api/chats/conversations', {
+      const res = await axios.post('https://iqrab1.skoolific.com/api/chats/conversations', {
         type: 'direct',
         participants: [
           { user_id: currentUserId, user_name: currentUserName, user_type: currentUserType },
@@ -155,7 +155,7 @@ const GuardianMessages = () => {
       
       // Select the new conversation
       const newConv = res.data;
-      const convDetails = await axios.get(`https://bilal.skoolific.com/api/chats/conversations/${newConv.id}`);
+      const convDetails = await axios.get(`https://iqrab1.skoolific.com/api/chats/conversations/${newConv.id}`);
       setActiveConversation(convDetails.data);
       await fetchMessages(newConv.id);
     } catch (error) {

@@ -34,6 +34,8 @@ const { Option } = Select;
 const { TextArea } = Input;
 const { TabPane } = Tabs;
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://iqrab1.skoolific.com/api';
+
 const StudentFaultsS = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
@@ -87,7 +89,7 @@ const StudentFaultsS = () => {
       setIsLoading(true);
       try {
         console.log('Fetching classes from /api/faults/classes');
-        const response = await axios.get('https://bilal.skoolific.com/api/faults/classes');
+        const response = await axios.get(`${API_BASE_URL}/faults/classes`);
         console.log('Classes fetched:', response.data);
         setClasses(response.data);
       } catch (error) {
@@ -102,7 +104,7 @@ const StudentFaultsS = () => {
       setIsLoading(true);
       try {
         console.log('Fetching reports from /api/faults/reports');
-        const response = await axios.get('https://bilal.skoolific.com/api/faults/reports');
+        const response = await axios.get(`${API_BASE_URL}/faults/reports`);
         console.log('Reports fetched:', response.data);
         setReports(response.data);
       } catch (error) {
@@ -125,12 +127,12 @@ const StudentFaultsS = () => {
     setIsLoading(true);
     try {
       console.log(`Fetching students for class: ${className}`);
-      const studentsResponse = await axios.get(`https://bilal.skoolific.com/api/faults/students/${className}`);
+      const studentsResponse = await axios.get(`${API_BASE_URL}/faults/students/${className}`);
       console.log(`Students fetched for ${className}:`, studentsResponse.data);
       setStudents(studentsResponse.data);
 
       console.log(`Fetching faults for class: ${className}`);
-      const faultsResponse = await axios.get(`https://bilal.skoolific.com/api/faults/faults/${className}`);
+      const faultsResponse = await axios.get(`${API_BASE_URL}/faults/faults/${className}`);
       console.log(`Faults fetched for ${className}:`, faultsResponse.data);
       setFaults(faultsResponse.data);
     } catch (error) {
@@ -196,7 +198,7 @@ const StudentFaultsS = () => {
       }
 
       console.log(`Submitting fault for ${formData.student_name} in class ${selectedClass}`);
-      const response = await axios.post('https://bilal.skoolific.com/api/faults/add-fault', formDataToSend, {
+      const response = await axios.post(`${API_BASE_URL}/faults/add-fault`, formDataToSend, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       console.log('Fault added:', response.data);
@@ -213,7 +215,7 @@ const StudentFaultsS = () => {
         attachment: null,
       });
       // Refresh reports
-      const reportsResponse = await axios.get('https://bilal.skoolific.com/api/faults/reports');
+      const reportsResponse = await axios.get(`${API_BASE_URL}/faults/reports`);
       setReports(reportsResponse.data);
     } catch (error) {
       console.error('Error adding fault:', error);
@@ -257,7 +259,7 @@ const StudentFaultsS = () => {
 
       console.log(`Updating fault ID ${selectedFault.id} in class ${selectedClass}`);
       const response = await axios.put(
-        `https://bilal.skoolific.com/api/faults/edit-fault/${selectedClass}/${selectedFault.id}`,
+        `${API_BASE_URL}/faults/edit-fault/${selectedClass}/${selectedFault.id}`,
         formDataToSend,
         { headers: { 'Content-Type': 'multipart/form-data' } }
       );
@@ -266,7 +268,7 @@ const StudentFaultsS = () => {
       setIsEditModalVisible(false);
       handleClassSelect(selectedClass); // Refresh faults
       // Refresh reports
-      const reportsResponse = await axios.get('https://bilal.skoolific.com/api/faults/reports');
+      const reportsResponse = await axios.get('https://iqrab1.skoolific.com/api/faults/reports');
       setReports(reportsResponse.data);
     } catch (error) {
       console.error('Error updating fault:', error);
@@ -280,12 +282,12 @@ const StudentFaultsS = () => {
     setIsLoading(true);
     try {
       console.log(`Deleting fault ID ${faultId} in class ${selectedClass}`);
-      const response = await axios.delete(`https://bilal.skoolific.com/api/faults/delete-fault/${selectedClass}/${faultId}`);
+      const response = await axios.delete(`${API_BASE_URL}/faults/delete-fault/${selectedClass}/${faultId}`);
       console.log('Fault deleted:', response.data);
       message.success('Fault deleted successfully');
       handleClassSelect(selectedClass); // Refresh faults
       // Refresh reports
-      const reportsResponse = await axios.get('https://bilal.skoolific.com/api/faults/reports');
+      const reportsResponse = await axios.get(`${API_BASE_URL}/faults/reports`);
       setReports(reportsResponse.data);
     } catch (error) {
       console.error('Error deleting fault:', error);

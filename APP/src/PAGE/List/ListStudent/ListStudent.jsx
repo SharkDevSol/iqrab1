@@ -14,7 +14,7 @@ import { useApp } from '../../../context/AppContext';
 import styles from './ListStudent.module.css';
 
 // API base URL - use environment variable or fallback to localhost
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://bilal.skoolific.com/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://iqrab1.skoolific.com/api';
 
 const ListStudent = () => {
   const { t } = useApp();

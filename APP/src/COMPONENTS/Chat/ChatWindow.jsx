@@ -228,7 +228,7 @@ const ChatWindow = ({
                         {message.attachments.map(att => (
                           <a
                             key={att.id}
-                            href={`https://bilal.skoolific.com/api/chats/attachments/${att.id}`}
+                            href={`https://iqrab1.skoolific.com/api/chats/attachments/${att.id}`}
                             download={att.original_name}
                             className={styles.attachment}
                           >

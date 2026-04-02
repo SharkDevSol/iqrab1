@@ -99,14 +99,14 @@ const GuardianProfile = () => {
   const fetchProfile = useCallback(async () => {
     try {
       // First verify guardian role
-      const response = await axios.get(`https://bilal.skoolific.com/api/students/guardian-profile/${username}`);
+      const response = await axios.get(`https://iqrab1.skoolific.com/api/students/guardian-profile/${username}`);
       if (response.data.role !== 'guardian') {
         setError('This page is for guardians only.');
         return;
       }
       
       // Fetch all guardians with associated students (same as ListGuardian)
-      const guardiansResponse = await axios.get('https://bilal.skoolific.com/api/guardian-list/guardians');
+      const guardiansResponse = await axios.get('https://iqrab1.skoolific.com/api/guardian-list/guardians');
       const currentGuardian = guardiansResponse.data.find(
         guardian => guardian.guardian_username === username
       );
@@ -141,7 +141,7 @@ const GuardianProfile = () => {
 
   const fetchProfilePosts = useCallback(async (schoolId) => {
     try {
-      const response = await axios.get(`https://bilal.skoolific.com/api/posts/profile/guardian/${schoolId}`);
+      const response = await axios.get(`https://iqrab1.skoolific.com/api/posts/profile/guardian/${schoolId}`);
       setProfilePosts(response.data.map(post => ({ ...post, localLikes: post.likes || 0 })));
     } catch (err) {
       console.error('Error fetching profile posts:', err);
@@ -169,7 +169,7 @@ const GuardianProfile = () => {
     setMarksLoading(true);
     try {
       const response = await axios.get(
-        `https://bilal.skoolific.com/api/mark-list/guardian-marks/${encodeURIComponent(guardianUsername)}`
+        `https://iqrab1.skoolific.com/api/mark-list/guardian-marks/${encodeURIComponent(guardianUsername)}`
       );
       if (response.data.success) {
         // Organize marks by student school_id for easy access
@@ -234,7 +234,7 @@ const GuardianProfile = () => {
     try {
       // Fetch current month's attendance using Ethiopian calendar
       const response = await axios.get(
-        `https://bilal.skoolific.com/api/guardian-student-attendance/student-attendance/${encodeURIComponent(ward.class)}/${ward.school_id}?year=${selectedYear}&month=${selectedMonth}`
+        `https://iqrab1.skoolific.com/api/guardian-student-attendance/student-attendance/${encodeURIComponent(ward.class)}/${ward.school_id}?year=${selectedYear}&month=${selectedMonth}`
       );
       
       // Store the attendance data
@@ -260,7 +260,7 @@ const GuardianProfile = () => {
     try {
       const className = ward.class.replace(/\s+/g, '_');
       const response = await axios.get(
-        `https://bilal.skoolific.com/api/guardian-attendance/student/${encodeURIComponent(className)}/${encodeURIComponent(tableName)}/${ward.school_id}`
+        `https://iqrab1.skoolific.com/api/guardian-attendance/student/${encodeURIComponent(className)}/${encodeURIComponent(tableName)}/${ward.school_id}`
       );
       setWardAttendance(prev => ({
         ...prev,
@@ -281,13 +281,13 @@ const GuardianProfile = () => {
     try {
       // Fetch summary
       const summaryResponse = await axios.get(
-        `https://bilal.skoolific.com/api/guardian-student-attendance/monthly-summary/${encodeURIComponent(ward.class)}/${ward.school_id}?year=${year}&month=${month}`
+        `https://iqrab1.skoolific.com/api/guardian-student-attendance/monthly-summary/${encodeURIComponent(ward.class)}/${ward.school_id}?year=${year}&month=${month}`
       );
       setMonthlySummary(summaryResponse.data);
 
       // Fetch daily details
       const dailyResponse = await axios.get(
-        `https://bilal.skoolific.com/api/guardian-student-attendance/student-attendance/${encodeURIComponent(ward.class)}/${ward.school_id}?year=${year}&month=${month}`
+        `https://iqrab1.skoolific.com/api/guardian-student-attendance/student-attendance/${encodeURIComponent(ward.class)}/${ward.school_id}?year=${year}&month=${month}`
       );
       setDailyAttendance(dailyResponse.data.attendance || []);
     } catch (err) {
@@ -303,7 +303,7 @@ const GuardianProfile = () => {
     setAttendanceLoading(true);
     try {
       const response = await axios.get(
-        `https://bilal.skoolific.com/api/guardian-student-attendance/trends/${encodeURIComponent(ward.class)}/${ward.school_id}`
+        `https://iqrab1.skoolific.com/api/guardian-student-attendance/trends/${encodeURIComponent(ward.class)}/${ward.school_id}`
       );
       setAttendanceTrends(response.data.trends || []);
     } catch (err) {
@@ -319,7 +319,7 @@ const GuardianProfile = () => {
     try {
       const className = ward.class.replace(/\s+/g, '_');
       const response = await axios.get(
-        `https://bilal.skoolific.com/api/guardian-attendance/report/${encodeURIComponent(className)}/${ward.school_id}/${year}/${month}`,
+        `https://iqrab1.skoolific.com/api/guardian-attendance/report/${encodeURIComponent(className)}/${ward.school_id}/${year}/${month}`,
         { responseType: 'blob' }
       );
       
@@ -376,7 +376,7 @@ const GuardianProfile = () => {
     try {
       // First try fetching by guardian_id
       const response = await axios.get(
-        `https://bilal.skoolific.com/api/evaluation-book/daily/guardian/${encodeURIComponent(guardianId)}`
+        `https://iqrab1.skoolific.com/api/evaluation-book/daily/guardian/${encodeURIComponent(guardianId)}`
       );
       let evaluations = response.data || [];
       
@@ -388,7 +388,7 @@ const GuardianProfile = () => {
           if (ward.class && ward.student_name) {
             try {
               const classResponse = await axios.get(
-                `https://bilal.skoolific.com/api/evaluation-book/daily/class/${encodeURIComponent(ward.class)}`
+                `https://iqrab1.skoolific.com/api/evaluation-book/daily/class/${encodeURIComponent(ward.class)}`
               );
               const wardEvals = (classResponse.data || []).filter(
                 e => e.student_name === ward.student_name
@@ -428,7 +428,7 @@ const GuardianProfile = () => {
     try {
       console.log('Fetching payments for guardian:', guardianUsername);
       const response = await axios.get(
-        `https://bilal.skoolific.com/api/guardian-payments/${encodeURIComponent(guardianUsername)}`
+        `https://iqrab1.skoolific.com/api/guardian-payments/${encodeURIComponent(guardianUsername)}`
       );
       console.log('Payments API Response:', response.data);
       if (response.data.success) {
@@ -471,7 +471,7 @@ const GuardianProfile = () => {
           const today = new Date();
           const ethDate = gregorianToEthiopian(today);
           const response = await axios.get(
-            `https://bilal.skoolific.com/api/guardian-student-attendance/student-attendance/${encodeURIComponent(ward.class)}/${ward.school_id}?year=${ethDate.year}&month=${ethDate.month}`
+            `https://iqrab1.skoolific.com/api/guardian-student-attendance/student-attendance/${encodeURIComponent(ward.class)}/${ward.school_id}?year=${ethDate.year}&month=${ethDate.month}`
           );
           
           const todayAttendance = response.data.attendance?.find(a => {
@@ -498,7 +498,7 @@ const GuardianProfile = () => {
       // Fetch payment notifications
       try {
         const paymentResponse = await axios.get(
-          `https://bilal.skoolific.com/api/guardian-payments/${encodeURIComponent(guardianInfo.guardian_username)}`
+          `https://iqrab1.skoolific.com/api/guardian-payments/${encodeURIComponent(guardianInfo.guardian_username)}`
         );
         
         if (paymentResponse.data.success) {
@@ -622,7 +622,7 @@ const GuardianProfile = () => {
     }
     setFeedbackSaving(true);
     try {
-      await axios.post('https://bilal.skoolific.com/api/evaluation-book/feedback', {
+      await axios.post('https://iqrab1.skoolific.com/api/evaluation-book/feedback', {
         daily_evaluation_id: selectedEvaluation.id,
         guardian_id: guardianInfo?.guardian_username,
         feedback_text: feedbackText.trim()
@@ -662,7 +662,7 @@ const GuardianProfile = () => {
 
   const handleLike = async (postId) => {
     try {
-      await axios.put(`https://bilal.skoolific.com/api/posts/${postId}/like`);
+      await axios.put(`https://iqrab1.skoolific.com/api/posts/${postId}/like`);
       setProfilePosts(prev =>
         prev.map(post =>
           post.id === postId
@@ -719,7 +719,7 @@ const GuardianProfile = () => {
             const getImageUrl = (imagePath) => {
               if (!imagePath) return null;
               const cleanPath = imagePath.replace(/^\/?(uploads|Uploads)\//i, '');
-              return `https://bilal.skoolific.com/uploads/${cleanPath}`;
+              return `https://iqrab1.skoolific.com/uploads/${cleanPath}`;
             };
             
             return (
@@ -1057,7 +1057,7 @@ const GuardianProfile = () => {
       // Initialize Socket.IO
       if (!socketRef.current) {
         console.log('Initializing socket for:', currentUserId);
-        socketRef.current = io('https://bilal.skoolific.com');
+        socketRef.current = io('https://iqrab1.skoolific.com');
         socketRef.current.emit('join', currentUserId);
 
         socketRef.current.on('new_message', (data) => {
@@ -1097,7 +1097,7 @@ const GuardianProfile = () => {
 
   const fetchChatConversations = async (userId) => {
     try {
-      const res = await axios.get(`https://bilal.skoolific.com/api/chats/conversations?userId=${userId}`);
+      const res = await axios.get(`https://iqrab1.skoolific.com/api/chats/conversations?userId=${userId}`);
       setConversations(res.data.map(c => ({ ...c, currentUserId: userId })));
     } catch (error) {
       console.error('Error fetching conversations:', error);
@@ -1109,7 +1109,7 @@ const GuardianProfile = () => {
   const fetchChatContacts = async () => {
     setContactsLoading(true);
     try {
-      const teachersRes = await axios.get('https://bilal.skoolific.com/api/chats/contacts/teachers');
+      const teachersRes = await axios.get('https://iqrab1.skoolific.com/api/chats/contacts/teachers');
       
       // Add the main admin (from /communication page)
       const mainAdmin = {
@@ -1136,10 +1136,10 @@ const GuardianProfile = () => {
   const fetchChatMessages = async (conversationId, userId) => {
     setMessagesLoading(true);
     try {
-      const res = await axios.get(`https://bilal.skoolific.com/api/chats/conversations/${conversationId}/messages`);
+      const res = await axios.get(`https://iqrab1.skoolific.com/api/chats/conversations/${conversationId}/messages`);
       setMessages(res.data);
       
-      await axios.put('https://bilal.skoolific.com/api/chats/messages/read', {
+      await axios.put('https://iqrab1.skoolific.com/api/chats/messages/read', {
         conversationId,
         userId
       });
@@ -1165,7 +1165,7 @@ const GuardianProfile = () => {
     
     try {
       const res = await axios.post(
-        `https://bilal.skoolific.com/api/chats/conversations/${activeConversation.id}/messages`,
+        `https://iqrab1.skoolific.com/api/chats/conversations/${activeConversation.id}/messages`,
         formData,
         { headers: { 'Content-Type': 'multipart/form-data' } }
       );
@@ -1202,7 +1202,7 @@ const GuardianProfile = () => {
     console.log('Guardian user ID:', currentUserId);
     
     try {
-      const res = await axios.post('https://bilal.skoolific.com/api/chats/conversations', {
+      const res = await axios.post('https://iqrab1.skoolific.com/api/chats/conversations', {
         type: 'direct',
         participants: [
           { user_id: currentUserId, user_name: currentUserName, user_type: currentUserType },
@@ -1217,7 +1217,7 @@ const GuardianProfile = () => {
       await fetchChatConversations(currentUserId);
       
       const newConv = res.data;
-      const convDetails = await axios.get(`https://bilal.skoolific.com/api/chats/conversations/${newConv.id}`);
+      const convDetails = await axios.get(`https://iqrab1.skoolific.com/api/chats/conversations/${newConv.id}`);
       console.log('Conversation details:', convDetails.data);
       
       setActiveConversation(convDetails.data);

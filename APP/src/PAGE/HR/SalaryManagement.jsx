@@ -9,7 +9,7 @@ import AddRetentionModal from './components/AddRetentionModal';
 import StaffDeductionsAllowancesModal from './components/StaffDeductionsAllowancesModal';
 import { getCurrentEthiopianMonth } from '../../utils/ethiopianCalendar';
 
-const API_URL = import.meta.env.VITE_API_URL || 'https://bilal.skoolific.com';
+const API_URL = import.meta.env.VITE_API_URL || 'https://iqrab1.skoolific.com';
 
 const SalaryManagement = () => {
   const [allStaff, setAllStaff] = useState([]);

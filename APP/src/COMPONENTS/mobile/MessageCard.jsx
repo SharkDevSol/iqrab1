@@ -27,7 +27,7 @@ const MessageCard = ({ message, showTeacherInfo = true }) => {
   };
 
   const handleDownload = (attachment) => {
-    window.open(`https://bilal.skoolific.com/api/class-communication/attachments/${attachment.id}`, '_blank');
+    window.open(`https://iqrab1.skoolific.com/api/class-communication/attachments/${attachment.id}`, '_blank');
   };
 
   return (
@@ -54,7 +54,7 @@ const MessageCard = ({ message, showTeacherInfo = true }) => {
               {isImageFile(att.file_type) ? (
                 <div className={styles.imagePreview}>
                   <img 
-                    src={`https://bilal.skoolific.com/api/class-communication/attachments/${att.id}`}
+                    src={`https://iqrab1.skoolific.com/api/class-communication/attachments/${att.id}`}
                     alt={att.original_name}
                     className={styles.thumbnailImage}
                   />

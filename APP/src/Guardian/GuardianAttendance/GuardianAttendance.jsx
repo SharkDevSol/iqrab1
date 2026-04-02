@@ -21,7 +21,7 @@ const GuardianAttendance = () => {
     try {
       const guardianInfo = JSON.parse(localStorage.getItem('guardianInfo') || '{}');
       const response = await axios.get(
-        `https://bilal.skoolific.com/api/guardian-attendance/guardian-attendance/${guardianInfo.guardian_username}`,
+        `https://iqrab1.skoolific.com/api/guardian-attendance/guardian-attendance/${guardianInfo.guardian_username}`,
         {
           params: {
             year: selectedYear,

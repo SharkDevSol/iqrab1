@@ -26,7 +26,7 @@ const StaffAttendanceWrapper = () => {
         return;
       }
 
-      const response = await axios.get(`https://bilal.skoolific.com/api/class-teacher/check/${globalStaffId}`);
+      const response = await axios.get(`https://iqrab1.skoolific.com/api/class-teacher/check/${globalStaffId}`);
       
       if (response.data.isClassTeacher) {
         setAssignedClass(response.data.assignedClass);

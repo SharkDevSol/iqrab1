@@ -32,7 +32,7 @@ const ListGuardian = () => {
   const fetchGuardians = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('https://bilal.skoolific.com/api/guardian-list/guardians');
+      const response = await axios.get('https://iqrab1.skoolific.com/api/guardian-list/guardians');
       setGuardians(response.data);
       setFilteredGuardians(response.data);
     } catch (error) {

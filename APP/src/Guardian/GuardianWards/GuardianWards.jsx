@@ -16,7 +16,7 @@ const GuardianWards = () => {
   const fetchWards = async () => {
     try {
       const guardianInfo = JSON.parse(localStorage.getItem('guardianInfo') || '{}');
-      const guardiansResponse = await axios.get('https://bilal.skoolific.com/api/guardian-list/guardians');
+      const guardiansResponse = await axios.get('https://iqrab1.skoolific.com/api/guardian-list/guardians');
       const currentGuardian = guardiansResponse.data.find(
         guardian => guardian.guardian_username === guardianInfo.guardian_username ||
                    guardian.guardian_phone === guardianInfo.guardian_phone
@@ -72,7 +72,7 @@ const GuardianWards = () => {
                 <div className={styles.wardHeader}>
                   <div className={styles.avatar}>
                     {ward.image_student ? (
-                      <img src={`https://bilal.skoolific.com/uploads/${ward.image_student}`} alt={ward.student_name} />
+                      <img src={`https://iqrab1.skoolific.com/uploads/${ward.image_student}`} alt={ward.student_name} />
                     ) : (
                       <FiUser size={32} />
                     )}
@@ -130,7 +130,7 @@ const GuardianWards = () => {
             <div className={styles.modalBody}>
               <div className={styles.modalAvatar}>
                 {selectedWard.image_student ? (
-                  <img src={`https://bilal.skoolific.com/uploads/${selectedWard.image_student}`} alt={selectedWard.student_name} />
+                  <img src={`https://iqrab1.skoolific.com/uploads/${selectedWard.image_student}`} alt={selectedWard.student_name} />
                 ) : (
                   <FiUser size={64} />
                 )}

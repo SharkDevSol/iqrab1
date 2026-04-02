@@ -217,7 +217,7 @@ describe('AccountForm Component', () => {
 
       await waitFor(() => {
         expect(global.fetch).toHaveBeenCalledWith(
-          'https://bilal.skoolific.com/api/finance/accounts',
+          'https://iqrab1.skoolific.com/api/finance/accounts',
           expect.objectContaining({
             method: 'POST',
             headers: expect.objectContaining({

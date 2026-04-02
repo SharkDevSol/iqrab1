@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { getCurrentEthiopianMonthRange } from '../../../utils/ethiopianCalendar';
 
-const API_URL = import.meta.env.VITE_API_URL || 'https://bilal.skoolific.com';
+const API_URL = import.meta.env.VITE_API_URL || 'https://iqrab1.skoolific.com';
 
 const AddDeductionModal = ({ onClose, preSelectedStaff }) => {
   const [staffTypes, setStaffTypes] = useState([]);

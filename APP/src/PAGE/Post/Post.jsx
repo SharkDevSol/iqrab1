@@ -11,6 +11,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FaChalkboardTeacher, FaUserGraduate, FaUserShield, FaHeart } from 'react-icons/fa';
 import { useApp } from '../../context/AppContext';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL?.replace('/api', '') || 'https://iqrab1.skoolific.com';
+
 const Post = () => {
   const { t } = useApp();
   const [posts, setPosts] = useState([]);
@@ -159,7 +161,7 @@ const Post = () => {
             return (
               <div key={index} className={styles.mediaItem}>
                 <img 
-                  src={`https://bilal.skoolific.com/Uploads/posts/${item.filename}`} 
+                  src={`${API_BASE_URL}/Uploads/posts/${item.filename}`} 
                   alt="Post media" 
                 />
                 {media.length > 4 && index === 3 && (
@@ -170,14 +172,14 @@ const Post = () => {
           } else if (item.mimetype?.startsWith('video/')) {
             return (
               <div key={index} className={styles.mediaItem}>
-                <video controls src={`https://bilal.skoolific.com/Uploads/posts/${item.filename}`} />
+                <video controls src={`${API_BASE_URL}/Uploads/posts/${item.filename}`} />
               </div>
             );
           } else {
             return (
               <a 
                 key={index} 
-                href={`https://bilal.skoolific.com/Uploads/posts/${item.filename}`} 
+                href={`https://iqrab1.skoolific.com/Uploads/posts/${item.filename}`} 
                 download 
                 className={styles.fileAttachment}
               >

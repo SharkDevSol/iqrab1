@@ -4,7 +4,7 @@ import { FiPlus, FiTrash2, FiUsers, FiUser, FiCheck, FiAlertCircle, FiSearch } f
 import { useApp } from '../../context/AppContext';
 import styles from './TeacherAssignmentManager.module.css';
 
-const API_BASE = 'https://bilal.skoolific.com/api/evaluation-book';
+const API_BASE = 'https://iqrab1.skoolific.com/api/evaluation-book';
 
 const TeacherAssignmentManager = () => {
   const { t } = useApp();

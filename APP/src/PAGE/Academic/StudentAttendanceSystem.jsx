@@ -4,7 +4,7 @@ import { FiCalendar, FiUsers, FiCheckCircle, FiXCircle, FiClock, FiEdit2, FiX, F
 import styles from './StudentAttendanceSystem.module.css';
 
 // API base URL
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://bilal.skoolific.com/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://iqrab1.skoolific.com/api';
 
 const StudentAttendanceSystem = ({ preSelectedClass = null }) => {
   const [selectedClass, setSelectedClass] = useState(preSelectedClass || '');

@@ -128,7 +128,7 @@ export const getFileUrl = (filename, type = 'staff') => {
   const fileStr = String(filename);
   
   // API base URL from environment variable
-  const API_BASE = import.meta.env.VITE_API_URL?.replace('/api', '') || 'https://bilal.skoolific.com';
+  const API_BASE = import.meta.env.VITE_API_URL?.replace('/api', '') || 'https://iqrab1.skoolific.com';
   
   // If already a full URL
   if (fileStr.startsWith('http')) {

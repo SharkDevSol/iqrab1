@@ -23,7 +23,7 @@ import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import { useApp } from '../../context/AppContext';
 
-const API_BASE_URL = 'https://bilal.skoolific.com/api';
+const API_BASE_URL = 'https://iqrab1.skoolific.com/api';
 
 const MarkListView = () => {
   const { t, theme } = useApp();

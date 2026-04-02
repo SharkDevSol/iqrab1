@@ -4,7 +4,7 @@ import { useApp } from '../../context/AppContext';
 import SubjectMappingSetup from './SubjectMappingSetup';
 import './CreateMarklist/MarkListFrontend.css';
 
-const API_BASE_URL = 'https://bilal.skoolific.com/api';
+const API_BASE_URL = 'https://iqrab1.skoolific.com/api';
 
 const MarkListForm = () => {
   const { t } = useApp();

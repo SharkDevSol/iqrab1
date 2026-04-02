@@ -5,6 +5,8 @@ import axios from 'axios';
 import { FiArrowLeft, FiSave, FiX } from 'react-icons/fi';
 import styles from './EditStaff.module.css';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://iqrab1.skoolific.com/api';
+
 const EditStaff = () => {
   const { staffType, className, uniqueId } = useParams();
   const navigate = useNavigate();
@@ -39,7 +41,7 @@ const EditStaff = () => {
   const fetchColumns = async () => {
     try {
       const response = await axios.get(
-        `https://bilal.skoolific.com/api/staff/columns/${encodeURIComponent(staffType)}/${encodeURIComponent(className)}`
+        `${API_BASE_URL}/staff/columns/${encodeURIComponent(staffType)}/${encodeURIComponent(className)}`
       );
       setColumns(response.data);
     } catch (error) {
@@ -96,7 +98,7 @@ const EditStaff = () => {
 
     try {
       const response = await axios.put(
-        `https://bilal.skoolific.com/api/staff/update/${staffData.global_staff_id || staffData.id}`,
+        `${API_BASE_URL}/staff/update/${staffData.global_staff_id || staffData.id}`,
         formDataToSend,
         { headers: { 'Content-Type': 'multipart/form-data' } }
       );

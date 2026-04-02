@@ -12,7 +12,7 @@ import * as XLSX from 'xlsx';
 import styles from './CreateRegisterStudent.module.css';
 
 // API base URL - use environment variable or fallback to localhost
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://bilal.skoolific.com/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://iqrab1.skoolific.com/api';
 
 const AddStudentS = () => {
   const { register, handleSubmit, formState: { errors }, setValue, reset, control, clearErrors, trigger } = useForm({

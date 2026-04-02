@@ -260,7 +260,7 @@ const MonthlyPaymentsNew = () => {
     try {
       const response = await api.get('/settings/branding');
       setSchoolInfo({
-        logo: response.data.logo ? `https://bilal.skoolific.com${response.data.logo}` : null,
+        logo: response.data.logo ? `https://iqrab1.skoolific.com${response.data.logo}` : null,
         nameEn: response.data.schoolName || 'Dugsiga Barbaarinta Caruurta, Hoose, Dhexe & Sare Ee Iqra',
         nameAm: response.data.schoolNameAmharic || 'ኢቅራ ሮጸ አሕፃናት አንደኛና ሁለተኛ ደረጃ ት/ቤት'
       });
@@ -1949,7 +1949,7 @@ ${index + 1}. ${student.studentName || 'Unknown'}
                   {payment.screenshot && (
                     <div style={{ marginBottom: '10px' }}>
                       <strong>Screenshot:</strong>{' '}
-                      <a href={`https://bilal.skoolific.com${payment.screenshot}`} target="_blank" rel="noopener noreferrer">
+                      <a href={`https://iqrab1.skoolific.com${payment.screenshot}`} target="_blank" rel="noopener noreferrer">
                         View Receipt
                       </a>
                     </div>

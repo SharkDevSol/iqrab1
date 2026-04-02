@@ -4,7 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import api from '../utils/api';
 import styles from './TaskDetail.module.css';
 
-const API_BASE_URL = 'https://bilal.skoolific.com/api';
+const API_BASE_URL = 'https://iqrab1.skoolific.com/api';
 import StudentFormBuilder from '../PAGE/CreateRegister/CreateRegisterStudent/StudentFormBuilder';
 import StaffFormBuilder from '../PAGE/CreateRegister/CreateRegisterStaff/StaffFormBuilder';
 import CreateRegisterStaff from '../PAGE/CreateRegister/CreateRegisterStaff/CreateRegisterStaff';

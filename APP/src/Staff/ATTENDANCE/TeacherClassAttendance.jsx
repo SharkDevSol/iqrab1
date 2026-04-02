@@ -85,7 +85,7 @@ const TeacherClassAttendance = () => {
       }
 
       // Fetch class teacher assignment
-      const response = await axios.get('https://bilal.skoolific.com/api/class-teacher/assignments');
+      const response = await axios.get('https://iqrab1.skoolific.com/api/class-teacher/assignments');
       const assignment = response.data.find(a => a.global_staff_id === globalStaffId);
 
       if (assignment) {
@@ -101,7 +101,7 @@ const TeacherClassAttendance = () => {
 
   const fetchCurrentDate = async () => {
     try {
-      const response = await axios.get('https://bilal.skoolific.com/api/academic/student-attendance/current-date');
+      const response = await axios.get('https://iqrab1.skoolific.com/api/academic/student-attendance/current-date');
       if (response.data.success) {
         const date = response.data.data;
         setCurrentEthiopianDate(date);
@@ -114,7 +114,7 @@ const TeacherClassAttendance = () => {
 
   const fetchSettings = async () => {
     try {
-      const response = await axios.get('https://bilal.skoolific.com/api/academic/student-attendance/settings');
+      const response = await axios.get('https://iqrab1.skoolific.com/api/academic/student-attendance/settings');
       if (response.data.success) {
         setSettings(response.data.data);
       }
@@ -129,7 +129,7 @@ const TeacherClassAttendance = () => {
   const fetchStudents = async () => {
     try {
       setIsLoading(true);
-      const response = await axios.get('https://bilal.skoolific.com/api/academic/student-attendance/students', {
+      const response = await axios.get('https://iqrab1.skoolific.com/api/academic/student-attendance/students', {
         params: { class: assignedClass }
       });
       if (response.data.success) {
@@ -160,7 +160,7 @@ const TeacherClassAttendance = () => {
 
     while (daysChecked < maxDays && weekNumber <= 52) {
       try {
-        const response = await axios.get('https://bilal.skoolific.com/api/academic/student-attendance/day-of-week', {
+        const response = await axios.get('https://iqrab1.skoolific.com/api/academic/student-attendance/day-of-week', {
           params: { year: currentYear, month: currentMonth, day: currentDay }
         });
 
@@ -173,7 +173,7 @@ const TeacherClassAttendance = () => {
           let daysScanned = 0;
 
           while (schoolDaysCollected < daysPerWeek && daysScanned < 14) {
-            const dayResponse = await axios.get('https://bilal.skoolific.com/api/academic/student-attendance/day-of-week', {
+            const dayResponse = await axios.get('https://iqrab1.skoolific.com/api/academic/student-attendance/day-of-week', {
               params: { year: tempYear, month: tempMonth, day: tempDay }
             });
 
@@ -300,7 +300,7 @@ const TeacherClassAttendance = () => {
       setIsLoading(true);
       
       const promises = selectedWeek.days.map(day =>
-        axios.get('https://bilal.skoolific.com/api/academic/student-attendance/weekly', {
+        axios.get('https://iqrab1.skoolific.com/api/academic/student-attendance/weekly', {
           params: {
             week: Math.ceil(day.day / 7),
             year: day.year,
@@ -387,7 +387,7 @@ const TeacherClassAttendance = () => {
     try {
       setIsLoading(true);
 
-      const response = await axios.put('https://bilal.skoolific.com/api/academic/student-attendance/update', {
+      const response = await axios.put('https://iqrab1.skoolific.com/api/academic/student-attendance/update', {
         studentId: editModal.student.student_id,
         className: editModal.student.class_name,
         ethYear: editModal.dayInfo.year,
