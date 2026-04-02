@@ -2389,9 +2389,9 @@ const StaffProfile = () => {
               {students.map((student, index) => {
                 const status = getStudentStatus(student);
                 return (
-                  <div key={student.student_id || index} className={styles.studentCard} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem' }}>
-                    <div className={styles.studentInfo}>
-                      <div className={styles.studentAvatar}>
+                  <div key={student.student_id || index} className={styles.studentCard} style={{ display: 'flex', flexDirection: 'row', flexWrap: 'nowrap', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem', padding: '0.5rem 0.625rem' }}>
+                    <div className={styles.studentInfo} style={{ flex: '1', minWidth: 0, overflow: 'hidden' }}>
+                      <div className={styles.studentAvatar} style={{ width: '36px', height: '36px', flexShrink: 0 }}>
                         {student.image_student ? (
                           <img
                             src={`${API_BASE_URL.replace('/api', '')}/uploads/${student.image_student}`}
@@ -2403,28 +2403,32 @@ const StaffProfile = () => {
                           {student.student_name?.charAt(0) || 'S'}
                         </div>
                       </div>
-                      <div className={styles.studentDetails}>
-                        <h4>{student.student_name}</h4>
-                        <span className={styles.metaItem}>ID: {student.class_id || student.student_id}</span>
+                      <div className={styles.studentDetails} style={{ minWidth: 0 }}>
+                        <h4 style={{ margin: 0, fontSize: '0.82rem', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{student.student_name}</h4>
+                        <span className={styles.metaItem} style={{ fontSize: '0.7rem' }}>ID: {student.class_id || student.student_id}</span>
                       </div>
                     </div>
 
                     {/* Inline mark buttons */}
-                    <div className={styles.inlineMarkBtns}>
+                    <div className={styles.inlineMarkBtns} style={{ display: 'flex', flexDirection: 'row', flexShrink: 0, gap: '0.3rem' }}>
                       <button
                         className={`${styles.markBtn} ${styles.markBtnP} ${status === 'P' ? styles.markBtnActive : ''}`}
+                        style={{ width: '32px', height: '32px', fontSize: '0.8rem', borderRadius: '8px', flexShrink: 0 }}
                         onClick={() => markStudent(student, status === 'P' ? '' : 'P')}
                       >✓</button>
                       <button
                         className={`${styles.markBtn} ${styles.markBtnL} ${status === 'L' ? styles.markBtnActive : ''}`}
+                        style={{ width: '32px', height: '32px', fontSize: '0.8rem', borderRadius: '8px', flexShrink: 0 }}
                         onClick={() => markStudent(student, status === 'L' ? '' : 'L')}
                       >⏰</button>
                       <button
                         className={`${styles.markBtn} ${styles.markBtnA} ${status === 'A' ? styles.markBtnActive : ''}`}
+                        style={{ width: '32px', height: '32px', fontSize: '0.8rem', borderRadius: '8px', flexShrink: 0 }}
                         onClick={() => markStudent(student, status === 'A' ? '' : 'A')}
                       >✗</button>
                       <button
                         className={`${styles.markBtn} ${styles.markBtnE} ${status === 'E' ? styles.markBtnActive : ''}`}
+                        style={{ width: '32px', height: '32px', fontSize: '0.8rem', borderRadius: '8px', flexShrink: 0 }}
                         onClick={() => markStudent(student, status === 'E' ? '' : 'E')}
                       >F</button>
                     </div>
