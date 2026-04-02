@@ -2149,110 +2149,7 @@ const StaffProfile = () => {
                   </div>
                 </div>
 
-                {/* Mode Toggle */}
-                <div style={{ display: 'flex', gap: '0.5rem', margin: '0.75rem 0', alignItems: 'center' }}>
-                  <button
-                    onClick={() => setMarkListOneByOne(false)}
-                    style={{
-                      padding: '0.4rem 1rem', borderRadius: '20px', border: 'none', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600,
-                      background: !markListOneByOne ? '#667eea' : '#f0f0f0',
-                      color: !markListOneByOne ? 'white' : '#555'
-                    }}
-                  >List</button>
-                  <button
-                    onClick={() => { setMarkListOneByOne(true); setCurrentStudentIndex(0); }}
-                    style={{
-                      padding: '0.4rem 1rem', borderRadius: '20px', border: 'none', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600,
-                      background: markListOneByOne ? '#667eea' : '#f0f0f0',
-                      color: markListOneByOne ? 'white' : '#555'
-                    }}
-                  >One by One</button>
-                </div>
-
                 {/* Student Cards */}
-                {markListOneByOne && filteredMarkListData.length > 0 ? (() => {
-                  const student = filteredMarkListData[currentStudentIndex];
-                  const isAdmin = user?.staffType?.toLowerCase() === 'admin';
-                  const isLocked = savedMarkStudents.has(student.id) && !isAdmin;
-                  return (
-                    <div className={styles.markListStudentCard}>
-                      {/* Progress indicator */}
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-                        <span style={{ fontSize: '0.8rem', color: '#888' }}>{currentStudentIndex + 1} / {filteredMarkListData.length}</span>
-                        <div style={{ display: 'flex', gap: '0.5rem' }}>
-                          <button
-                            onClick={() => setCurrentStudentIndex(i => Math.max(0, i - 1))}
-                            disabled={currentStudentIndex === 0}
-                            style={{ padding: '0.3rem 0.75rem', borderRadius: '8px', border: '1px solid #e0e0e0', background: 'white', cursor: 'pointer', fontSize: '0.85rem' }}
-                          >← Prev</button>
-                          <button
-                            onClick={() => setCurrentStudentIndex(i => Math.min(filteredMarkListData.length - 1, i + 1))}
-                            disabled={currentStudentIndex === filteredMarkListData.length - 1}
-                            style={{ padding: '0.3rem 0.75rem', borderRadius: '8px', border: '1px solid #e0e0e0', background: 'white', cursor: 'pointer', fontSize: '0.85rem' }}
-                          >Next →</button>
-                        </div>
-                      </div>
-
-                      <div className={styles.markListStudentHeader}>
-                        <div className={styles.markListStudentInfo}>
-                          <div className={styles.markListStudentNumber}>{currentStudentIndex + 1}</div>
-                          <div>
-                            <h3 className={styles.markListStudentName}>{student.student_name}</h3>
-                            <p className={styles.markListStudentMeta}>{student.gender} • Age {student.age}</p>
-                          </div>
-                        </div>
-                        <div className={styles.markListStudentTotal}>
-                          <div className={styles.markListTotalLabel}>Total</div>
-                          <div className={styles.markListTotalValue}>{parseFloat(student.total) > 0 ? `${student.total}%` : ''}</div>
-                        </div>
-                      </div>
-
-                      <div className={styles.markListScoresGrid}>
-                        {markListConfig.mark_components.map(component => {
-                          const componentKey = component.name.toLowerCase().replace(/\s+/g, '_');
-                          return (
-                            <div key={component.name} className={styles.markListScoreItem}>
-                              <label>{component.name} ({component.percentage}%)</label>
-                              <input
-                                type="number"
-                                min="0"
-                                max={component.percentage}
-                                value={student[componentKey] === '' ? '' : (student[componentKey] === 0 || student[componentKey] === '0' || student[componentKey] === '0.00' || parseFloat(student[componentKey]) === 0) ? '' : student[componentKey]}
-                                onChange={(e) => handleMarkListMarkChange(student.id, componentKey, e.target.value)}
-                                placeholder="0"
-                                disabled={isLocked}
-                                style={{ fontSize: '1.2rem', fontWeight: 700 }}
-                              />
-                            </div>
-                          );
-                        })}
-                      </div>
-
-                      <div className={styles.markListStudentFooter}>
-                        <div className={`${styles.markListStatusBadge} ${student.pass_status === 'Pass' ? styles.markListStatusPass : styles.markListStatusFail}`}>
-                          {student.pass_status === 'Pass' ? <><FiCheck /> Passed</> : <><FiX /> Failed</>}
-                        </div>
-                        {isLocked ? (
-                          <span className={styles.markListLockedBadge}><FiCheckCircle size={14} /> Saved</span>
-                        ) : (
-                          <button
-                            className={styles.markListSaveBtn}
-                            onClick={async () => {
-                              await saveStudentMarks(student.id);
-                              // Auto advance to next student after save
-                              if (currentStudentIndex < filteredMarkListData.length - 1) {
-                                setCurrentStudentIndex(i => i + 1);
-                              }
-                            }}
-                            disabled={savingMarks}
-                          >
-                            <FiSave /> {currentStudentIndex < filteredMarkListData.length - 1 ? 'Save & Next' : 'Save'}
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })() : (
                 <div className={styles.markListStudents}>
                   {filteredMarkListData.map((student, idx) => {
                     const isAdmin = user?.staffType?.toLowerCase() === 'admin';
@@ -2315,7 +2212,6 @@ const StaffProfile = () => {
                     );
                   })}
                 </div>
-                )}
               </>
             )}
 
