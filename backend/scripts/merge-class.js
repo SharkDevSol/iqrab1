@@ -1,7 +1,7 @@
 const db = require('../config/db');
 
-const SOURCE = '8B';  // move FROM
-const TARGET = '8';   // move TO
+const SOURCE = 'G8B';  // move FROM
+const TARGET = 'G8A';   // move TO
 
 async function run() {
   try {
