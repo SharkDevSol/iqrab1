@@ -10,30 +10,58 @@ async function split() {
   try {
     await client.query('BEGIN');
 
-    // ── 1. Check current state ──────────────────────────────────────────────
-    const total = await client.query('SELECT COUNT(*) FROM classes_schema."G8"');
-    const g8aCount = await client.query(`SELECT COUNT(*) FROM classes_schema."G8" WHERE class = 'G8A'`);
-    const g8bCount = await client.query(`SELECT COUNT(*) FROM classes_schema."G8" WHERE class = 'G8B'`);
-    console.log('Total in G8 :', total.rows[0].count);
-    console.log('G8A students:', g8aCount.rows[0].count);
-    console.log('G8B students:', g8bCount.rows[0].count);
+    // ── 1. Find the actual table name (could be "8", "G8", "g8") ───────────
+    const allTables = await client.query(`
+      SELECT table_name FROM information_schema.tables
+      WHERE table_schema = 'classes_schema'
+      ORDER BY table_name
+    `);
+    console.log('All tables in classes_schema:', allTables.rows.map(r => r.table_name).join(', '));
 
-    // ── 2. Create G8A and G8B tables (same structure as G8) ─────────────────
+    // Find the G8 table - could be named "8", "G8", "g8"
+    const g8Table = allTables.rows.find(r =>
+      r.table_name === 'G8' || r.table_name === '8' || r.table_name === 'g8'
+    );
+
+    if (!g8Table) {
+      // Check if G8A and G8B already exist
+      const g8aExists = allTables.rows.find(r => r.table_name === 'G8A' || r.table_name === 'g8a');
+      const g8bExists = allTables.rows.find(r => r.table_name === 'G8B' || r.table_name === 'g8b');
+      if (g8aExists && g8bExists) {
+        console.log('✅ G8A and G8B already exist, skipping split. Running mark table restore only...');
+        await client.query('COMMIT');
+        await restoreMarkTables(client);
+        return;
+      }
+      throw new Error('No G8 table found (tried: G8, 8, g8)');
+    }
+
+    const srcTable = g8Table.table_name;
+    console.log(`Found source table: "${srcTable}"`);
+
+    const total = await client.query(`SELECT COUNT(*) FROM classes_schema."${srcTable}"`);
+    const g8aCount = await client.query(`SELECT COUNT(*) FROM classes_schema."${srcTable}" WHERE class = 'G8A'`);
+    const g8bCount = await client.query(`SELECT COUNT(*) FROM classes_schema."${srcTable}" WHERE class = 'G8B'`);
+    console.log('Total in table:', total.rows[0].count);
+    console.log('G8A students :', g8aCount.rows[0].count);
+    console.log('G8B students :', g8bCount.rows[0].count);
+
+    // ── 2. Create G8A and G8B tables ────────────────────────────────────────
     await client.query(`
       CREATE TABLE IF NOT EXISTS classes_schema."G8A" AS
-      SELECT * FROM classes_schema."G8" WHERE class = 'G8A'
+      SELECT * FROM classes_schema."${srcTable}" WHERE class = 'G8A'
     `);
     console.log('✅ G8A table created');
 
     await client.query(`
       CREATE TABLE IF NOT EXISTS classes_schema."G8B" AS
-      SELECT * FROM classes_schema."G8" WHERE class = 'G8B'
+      SELECT * FROM classes_schema."${srcTable}" WHERE class = 'G8B'
     `);
     console.log('✅ G8B table created');
 
-    // ── 3. Drop old G8 table ─────────────────────────────────────────────────
-    await client.query(`DROP TABLE classes_schema."G8"`);
-    console.log('✅ Old G8 table dropped');
+    // ── 3. Drop old table ────────────────────────────────────────────────────
+    await client.query(`DROP TABLE classes_schema."${srcTable}"`);
+    console.log(`✅ Old "${srcTable}" table dropped`);
 
     await client.query('COMMIT');
     console.log('\n✅ G8 split into G8A and G8B successfully.\n');
