@@ -149,6 +149,79 @@ router.get('/subjects', async (req, res) => {
   }
 });
 
+// Route to add a single subject (does NOT delete existing)
+router.post('/add-subject', async (req, res) => {
+  const { subject_name } = req.body;
+  if (!subject_name || !subject_name.trim()) {
+    return res.status(400).json({ error: 'Subject name is required' });
+  }
+  try {
+    const result = await pool.query(
+      'INSERT INTO subjects_of_school_schema.subjects (subject_name) VALUES ($1) ON CONFLICT (subject_name) DO NOTHING RETURNING *',
+      [subject_name.trim()]
+    );
+    if (result.rows.length === 0) {
+      return res.status(409).json({ error: 'Subject already exists' });
+    }
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error('Error adding subject:', error);
+    res.status(500).json({ error: 'Failed to add subject', details: error.message });
+  }
+});
+
+// Route to update a subject name (edit only)
+router.put('/update-subject/:id', async (req, res) => {
+  const { id } = req.params;
+  const { subject_name } = req.body;
+  if (!subject_name || !subject_name.trim()) {
+    return res.status(400).json({ error: 'Subject name is required' });
+  }
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const old = await client.query('SELECT subject_name FROM subjects_of_school_schema.subjects WHERE id = $1', [id]);
+    if (old.rows.length === 0) return res.status(404).json({ error: 'Subject not found' });
+    const oldName = old.rows[0].subject_name;
+    const newName = subject_name.trim();
+    // Update subject name
+    await client.query('UPDATE subjects_of_school_schema.subjects SET subject_name = $1 WHERE id = $2', [newName, id]);
+    // Update mappings
+    await client.query('UPDATE subjects_of_school_schema.subject_class_mappings SET subject_name = $1 WHERE subject_name = $2', [newName, oldName]);
+    await client.query('UPDATE subjects_of_school_schema.teachers_subjects SET subject_class = REPLACE(subject_class, $1, $2) WHERE subject_class LIKE $3', [oldName, newName, `${oldName}%`]);
+    await client.query('COMMIT');
+    res.json({ message: 'Subject updated successfully' });
+  } catch (error) {
+    await client.query('ROLLBACK');
+    console.error('Error updating subject:', error);
+    res.status(500).json({ error: 'Failed to update subject', details: error.message });
+  } finally {
+    client.release();
+  }
+});
+
+// Route to delete a subject (explicit delete only)
+router.delete('/delete-subject/:id', async (req, res) => {
+  const { id } = req.params;
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const subj = await client.query('SELECT subject_name FROM subjects_of_school_schema.subjects WHERE id = $1', [id]);
+    if (subj.rows.length === 0) return res.status(404).json({ error: 'Subject not found' });
+    const subjectName = subj.rows[0].subject_name;
+    await client.query('DELETE FROM subjects_of_school_schema.subject_class_mappings WHERE subject_name = $1', [subjectName]);
+    await client.query('DELETE FROM subjects_of_school_schema.subjects WHERE id = $1', [id]);
+    await client.query('COMMIT');
+    res.json({ message: 'Subject deleted successfully' });
+  } catch (error) {
+    await client.query('ROLLBACK');
+    console.error('Error deleting subject:', error);
+    res.status(500).json({ error: 'Failed to delete subject', details: error.message });
+  } finally {
+    client.release();
+  }
+});
+
 // Route to get school configuration (term count)
 router.get('/config', async (req, res) => {
   try {
