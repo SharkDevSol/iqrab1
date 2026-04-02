@@ -4782,19 +4782,13 @@
 
   .studentCard {
     padding: 0.875rem;
-    flex-direction: row;
-    align-items: center;
-    gap: 0.5rem;
-    justify-content: space-between;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
   }
 
   .studentInfo {
-    flex: 1;
-    min-width: 0;
-  }
-
-  .inlineMarkBtns {
-    flex-shrink: 0;
+    width: 100%;
   }
 
   .attendanceStatus {
@@ -4848,35 +4842,20 @@
   }
 
   .studentAvatar {
-    width: 36px;
-    height: 36px;
+    width: 40px;
+    height: 40px;
   }
 
   .avatarFallback {
-    font-size: 0.9rem;
+    font-size: 1rem;
   }
 
   .studentDetails h4 {
-    font-size: 0.85rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 120px;
+    font-size: 0.95rem;
   }
 
   .metaItem {
-    font-size: 0.7rem;
-  }
-
-  .markBtn {
-    width: 34px;
-    height: 34px;
-    font-size: 0.85rem;
-    border-radius: 8px;
-  }
-
-  .inlineMarkBtns {
-    gap: 0.3rem;
+    font-size: 0.75rem;
   }
 }
 
