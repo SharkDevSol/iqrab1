@@ -485,6 +485,15 @@ router.get('/mark-list/:subjectName/:className/:termNumber', async (req, res) =>
     const schemaName = `subject_${subjectName.toLowerCase().replace(/[\s\-\.]+/g, '_')}_schema`;
     const tableName = `${tableClassName}_term_${termNumber}`;
     
+    // SYNC STUDENTS: Add new active students and remove deactivated ones
+    // Try to find the actual class table name (handles G8A, 8A, 8a formats)
+    const classTableCheck = await client.query(
+      `SELECT table_name FROM information_schema.tables 
+       WHERE table_schema = 'classes_schema' AND LOWER(table_name) = LOWER($1)`,
+      [tableClassName]
+    );
+    const actualClassName = classTableCheck.rows.length > 0 ? classTableCheck.rows[0].table_name : tableClassName;
+
     // Check if is_active column exists
     const columnCheck = await client.query(`
       SELECT column_name 
@@ -492,19 +501,10 @@ router.get('/mark-list/:subjectName/:className/:termNumber', async (req, res) =>
       WHERE table_schema = 'classes_schema' 
         AND table_name = $1 
         AND column_name = 'is_active'
-    `, [className]);
+    `, [actualClassName]);
     
     const hasIsActive = columnCheck.rows.length > 0;
     const whereClause = hasIsActive ? 'WHERE is_active = TRUE OR is_active IS NULL' : '';
-    
-    // SYNC STUDENTS: Add new active students and remove deactivated ones
-    // Try to find the actual class table name (handles both G8A and 8A formats)
-    const classTableCheck = await client.query(
-      `SELECT table_name FROM information_schema.tables 
-       WHERE table_schema = 'classes_schema' AND (table_name = $1 OR table_name = $2)`,
-      [className, tableClassName.toUpperCase()]
-    );
-    const actualClassName = classTableCheck.rows.length > 0 ? classTableCheck.rows[0].table_name : className;
 
     // Get current active students from class table
     const activeStudentsResult = await client.query(
@@ -514,6 +514,14 @@ router.get('/mark-list/:subjectName/:className/:termNumber', async (req, res) =>
     const activeStudents = activeStudentsResult.rows;
     
     // Get current students in mark list
+    const tableExistsCheck = await client.query(
+      `SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_schema = $1 AND table_name = $2)`,
+      [schemaName, tableName]
+    );
+    if (!tableExistsCheck.rows[0].exists) {
+      return res.status(404).json({ error: 'Mark list not found. Please create the mark form first.' });
+    }
+
     const markListResult = await client.query(
       `SELECT student_name FROM ${schemaName}.${tableName}`
     );
@@ -554,8 +562,8 @@ router.get('/mark-list/:subjectName/:className/:termNumber', async (req, res) =>
     
     // Get form configuration
     const configResult = await client.query(
-      `SELECT * FROM ${schemaName}.form_config WHERE class_name = $1 AND term_number = $2`,
-      [className, termNumber]
+      `SELECT * FROM ${schemaName}.form_config WHERE LOWER(class_name) = LOWER($1) AND term_number = $2`,
+      [tableClassName, termNumber]
     );
     
     res.json({
