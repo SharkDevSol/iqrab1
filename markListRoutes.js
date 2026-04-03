@@ -402,7 +402,7 @@ router.get('/mark-list/:subjectName/:className/:termNumber', async (req, res) =>
   
   const client = await pool.connect();
   try {
-    const schemaName = `subject_${subjectName.toLowerCase().replace(/[\s\-]+/g, '_')}_schema`;
+    const schemaName = `subject_${subjectName.toLowerCase().replace(/[\s\-\.]+/g, '_')}_schema`;
     const tableName = `${className.toLowerCase()}_term_${termNumber}`;
     
     // Check if is_active column exists

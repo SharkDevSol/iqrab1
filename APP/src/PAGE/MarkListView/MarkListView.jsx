@@ -118,7 +118,7 @@ const MarkListView = () => {
         const results = await Promise.all(
           subjects.map((sub) =>
             axios
-              .get(`${API_BASE_URL}/mark-list/mark-list/${sub.subject_name}/${selectedClass}/${selectedTerm}`)
+              .get(`${API_BASE_URL}/mark-list/mark-list/${encodeURIComponent(sub.subject_name)}/${encodeURIComponent(selectedClass)}/${selectedTerm}`)
               .then((r) => ({ subject: sub.subject_name, data: r.data }))
               .catch(() => ({ subject: sub.subject_name, data: null }))
           )

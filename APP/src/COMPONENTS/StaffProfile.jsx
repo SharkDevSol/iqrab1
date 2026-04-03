@@ -19,7 +19,7 @@ import {
 import styles from './StaffProfile.module.css';
 
 // API base URL - use environment variable or fallback to localhost
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5011/api';
 
 const StaffProfile = () => {
   const [user, setUser] = useState(null);

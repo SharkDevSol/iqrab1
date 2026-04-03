@@ -3,7 +3,7 @@ import axios from 'axios';
 import { FiClock, FiSave, FiAlertCircle, FiCheckCircle } from 'react-icons/fi';
 import styles from './StudentAttendanceTimeSettings.module.css';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5011/api';
 
 const StudentAttendanceTimeSettings = () => {
   const [settings, setSettings] = useState({
