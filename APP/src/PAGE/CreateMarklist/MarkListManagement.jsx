@@ -145,7 +145,7 @@ const MarkListForm = () => {
     setLoading(true);
     try {
       const response = await fetch(
-        `/api/mark-list/mark-list/${selectedSubject}/${selectedClass}/${selectedTerm}`
+        `${API_BASE_URL}/mark-list/mark-list/${selectedSubject}/${selectedClass}/${selectedTerm}`
       );
       
       if (response.ok) {
@@ -154,7 +154,8 @@ const MarkListForm = () => {
         setFormConfig(data.config);
         setViewMode('view');
       } else {
-        setMessage('Mark list not found for this combination');
+        const errData = await response.json().catch(() => ({}));
+        setMessage(errData.error || 'Mark list not found for this combination');
         setMarkList([]);
         setFormConfig(null);
       }

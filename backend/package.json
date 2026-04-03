@@ -2,6 +2,7 @@
   "name": "school-management-backend",
   "version": "1.0.0",
   "scripts": {
+    "postinstall": "prisma generate",
     "prestart": "node validate-env.js && node validate-startup.js",
     "start": "node server.js",
     "dev": "nodemon server.js",

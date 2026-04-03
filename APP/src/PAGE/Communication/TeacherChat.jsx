@@ -49,7 +49,8 @@ const TeacherChat = () => {
   const fetchConversations = async () => {
     try {
       const res = await axios.get(`https://bilal.skoolific.com/api/chats/conversations?userId=${currentUserId}`);
-      setConversations(res.data.map(c => ({ ...c, currentUserId })));
+      const data = Array.isArray(res.data) ? res.data : [];
+      setConversations(data.map(c => ({ ...c, currentUserId })));
     } catch (error) {
       console.error('Error fetching conversations:', error);
     } finally {
@@ -62,7 +63,7 @@ const TeacherChat = () => {
     try {
       const res = await axios.get('https://bilal.skoolific.com/api/chats/contacts/guardians');
       console.log('Guardians fetched:', res.data);
-      setGuardians(res.data);
+      setGuardians(Array.isArray(res.data) ? res.data : []);
     } catch (error) {
       console.error('Error fetching guardians:', error);
       console.error('Error details:', error.response?.data);
