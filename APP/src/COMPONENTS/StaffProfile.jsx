@@ -2362,7 +2362,7 @@ const StaffProfile = () => {
         </div>
 
         {/* Students List */}
-        <div className={styles.studentsSection}>
+        <div className={styles.studentsSection} style={{padding:'1rem 0.75rem'}}>
           <div className={styles.sectionHeader}>
             <h3><FiUsers size={18} /> Students List</h3>
             <span className={styles.badge}>{students.length} students</span>
