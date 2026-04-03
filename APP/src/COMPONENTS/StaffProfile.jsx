@@ -880,10 +880,21 @@ const StaffProfile = () => {
     }
   }, [selectedWeek, assignedClass, isClassTeacher]);
 
-  // Fetch Ethiopian today and build week dates
+  // Fetch Ethiopian today from API (same as admin) and build week dates
   useEffect(() => {
-    const ethToday = convertToEthiopian(new Date());
-    setEthiopianToday(ethToday);
+    const fetchEthiopianToday = async () => {
+      try {
+        const res = await axios.get(`${API_BASE_URL}/academic/student-attendance/current-date`);
+        if (res.data.success) {
+          setEthiopianToday(res.data.data);
+        } else {
+          setEthiopianToday(convertToEthiopian(new Date()));
+        }
+      } catch {
+        setEthiopianToday(convertToEthiopian(new Date()));
+      }
+    };
+    fetchEthiopianToday();
   }, []);
 
   useEffect(() => {
