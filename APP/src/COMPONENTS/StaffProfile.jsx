@@ -2228,15 +2228,17 @@ const StaffProfile = () => {
                           return (
                             <div key={component.name} style={{display:'flex',flexDirection:'column',alignItems:'center',gap:'0.15rem',flex:1,minWidth:'50px'}}>
                               <span style={{fontSize:'0.65rem',color:'#64748b',fontWeight:600,textTransform:'uppercase'}}>{component.name}</span>
-                              <select
-                                value={val}
+                              <input
+                                type="number"
+                                min="0"
+                                max={component.percentage}
+                                value={student[componentKey] === '' ? '' : (parseFloat(student[componentKey]) === 0 ? '' : student[componentKey])}
                                 onChange={(e) => handleMarkListMarkChange(student.id, componentKey, e.target.value)}
                                 disabled={isLocked}
-                                style={{width:'100%',padding:'0.3rem 0.2rem',borderRadius:'8px',border:'1.5px solid',borderColor:val>0?'#6366f1':'#e2e8f0',background:val>0?'#eef2ff':'white',color:val>0?'#4f46e5':'#94a3b8',fontSize:'0.8rem',fontWeight:600,textAlign:'center',cursor:isLocked?'not-allowed':'pointer'}}
-                              >
-                                {opts.map(o => <option key={o} value={o}>{o}</option>)}
-                              </select>
-                              <span style={{fontSize:'0.6rem',color:'#94a3b8'}}>/{max}</span>
+                                placeholder="0"
+                                style={{width:'100%',padding:'0.3rem 0.2rem',borderRadius:'8px',border:'1.5px solid',borderColor:parseFloat(student[componentKey])>0?'#6366f1':'#e2e8f0',background:parseFloat(student[componentKey])>0?'#eef2ff':'white',color:'#1e293b',fontSize:'0.82rem',fontWeight:600,textAlign:'center',outline:'none'}}
+                              />
+                              <span style={{fontSize:'0.6rem',color:'#94a3b8'}}>/{component.percentage}</span>
                             </div>
                           );
                         })}
