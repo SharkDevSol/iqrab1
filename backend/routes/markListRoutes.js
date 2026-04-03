@@ -272,8 +272,21 @@ router.post('/map-subjects-classes', async (req, res) => {
       )
     `);
     
-    // Clear existing mappings
-    await client.query('DELETE FROM subjects_of_school_schema.subject_class_mappings');
+    // Delete only the mappings that are NOT in the new list (user unchecked them)
+    // First get all existing mappings
+    const existingResult = await client.query(
+      'SELECT subject_name, class_name FROM subjects_of_school_schema.subject_class_mappings'
+    );
+    const newSet = new Set(mappings.map(m => `${m.subjectName}||${m.className}`));
+    for (const row of existingResult.rows) {
+      const key = `${row.subject_name}||${row.class_name}`;
+      if (!newSet.has(key)) {
+        await client.query(
+          'DELETE FROM subjects_of_school_schema.subject_class_mappings WHERE subject_name=$1 AND class_name=$2',
+          [row.subject_name, row.class_name]
+        );
+      }
+    }
     
     // Validate and insert new mappings
     for (const mapping of mappings) {
@@ -473,7 +486,7 @@ router.post('/create-mark-forms', async (req, res) => {
 
 // Route to get mark list for a specific subject, class, and term
 // Helper: normalize class name for table lookup (G8A → 8a, 8A → 8a)
-const normalizeClassName = (name) => name.toLowerCase().replace(/^g/, '');
+const normalizeClassName = (name) => name.toLowerCase();
 
 router.get('/mark-list/:subjectName/:className/:termNumber', async (req, res) => {
   const { subjectName, termNumber } = req.params;
@@ -485,6 +498,15 @@ router.get('/mark-list/:subjectName/:className/:termNumber', async (req, res) =>
     const schemaName = `subject_${subjectName.toLowerCase().replace(/[\s\-\.]+/g, '_')}_schema`;
     const tableName = `${tableClassName}_term_${termNumber}`;
     
+    // SYNC STUDENTS: Add new active students and remove deactivated ones
+    // Try to find the actual class table name (handles G8A, 8A, 8a formats)
+    const classTableCheck = await client.query(
+      `SELECT table_name FROM information_schema.tables 
+       WHERE table_schema = 'classes_schema' AND LOWER(table_name) = LOWER($1)`,
+      [tableClassName]
+    );
+    const actualClassName = classTableCheck.rows.length > 0 ? classTableCheck.rows[0].table_name : tableClassName;
+
     // Check if is_active column exists
     const columnCheck = await client.query(`
       SELECT column_name 
@@ -492,19 +514,10 @@ router.get('/mark-list/:subjectName/:className/:termNumber', async (req, res) =>
       WHERE table_schema = 'classes_schema' 
         AND table_name = $1 
         AND column_name = 'is_active'
-    `, [className]);
+    `, [actualClassName]);
     
     const hasIsActive = columnCheck.rows.length > 0;
     const whereClause = hasIsActive ? 'WHERE is_active = TRUE OR is_active IS NULL' : '';
-    
-    // SYNC STUDENTS: Add new active students and remove deactivated ones
-    // Try to find the actual class table name (handles both G8A and 8A formats)
-    const classTableCheck = await client.query(
-      `SELECT table_name FROM information_schema.tables 
-       WHERE table_schema = 'classes_schema' AND (table_name = $1 OR table_name = $2)`,
-      [className, tableClassName.toUpperCase()]
-    );
-    const actualClassName = classTableCheck.rows.length > 0 ? classTableCheck.rows[0].table_name : className;
 
     // Get current active students from class table
     const activeStudentsResult = await client.query(
@@ -514,6 +527,14 @@ router.get('/mark-list/:subjectName/:className/:termNumber', async (req, res) =>
     const activeStudents = activeStudentsResult.rows;
     
     // Get current students in mark list
+    const tableExistsCheck = await client.query(
+      `SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_schema = $1 AND table_name = $2)`,
+      [schemaName, tableName]
+    );
+    if (!tableExistsCheck.rows[0].exists) {
+      return res.status(404).json({ error: 'Mark list not found. Please create the mark form first.' });
+    }
+
     const markListResult = await client.query(
       `SELECT student_name FROM ${schemaName}.${tableName}`
     );
@@ -554,8 +575,8 @@ router.get('/mark-list/:subjectName/:className/:termNumber', async (req, res) =>
     
     // Get form configuration
     const configResult = await client.query(
-      `SELECT * FROM ${schemaName}.form_config WHERE class_name = $1 AND term_number = $2`,
-      [className, termNumber]
+      `SELECT * FROM ${schemaName}.form_config WHERE LOWER(class_name) = LOWER($1) AND term_number = $2`,
+      [tableClassName, termNumber]
     );
     
     res.json({

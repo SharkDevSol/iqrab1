@@ -166,8 +166,7 @@ const MonthlyPaymentsNew = () => {
       console.log('Unlocked Total Pending:', response.data.summary.unlockedTotalPending);
       setOverview(response.data);
     } catch (error) {
-      console.error('Error fetching overview:', error);
-      alert('Failed to fetch payment overview');
+      console.error('Error fetching overview:', error.response?.data?.details || error.message);
     } finally {
       setLoading(false);
     }
@@ -181,7 +180,7 @@ const MonthlyPaymentsNew = () => {
       activeRules.sort((a, b) => a.gracePeriodDays - b.gracePeriodDays);
       setLateFeeRules(activeRules);
     } catch (error) {
-      console.error('Error fetching late fee rules:', error);
+      console.error('Error fetching late fee rules:', error.response?.data?.details || error.message);
       // Set empty array on error so component doesn't break
       setLateFeeRules([]);
     }

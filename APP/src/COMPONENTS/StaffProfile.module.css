@@ -4486,11 +4486,65 @@
   gap: 0.75rem;
 }
 
+/* Attendance student card - single row: name left, buttons right */
+.attendanceStudentCard {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem;
+  background: #f0f4ff;
+  border-radius: 12px;
+  border: 1.5px solid #c7d2fe;
+  gap: 0.5rem;
+  min-height: 44px;
+}
+
+.attendanceStudentName {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #1f2937;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.attendanceMarkBtns {
+  display: flex;
+  flex-direction: row;
+  gap: 0.25rem;
+  flex-shrink: 0;
+}
+
+/* Small attendance buttons */
+.attBtn {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  border: 1.5px solid;
+  background: white;
+  font-size: 0.72rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.attBtnP  { border-color: #22c55e; color: #22c55e; }
+.attBtnL  { border-color: #f59e0b; color: #f59e0b; }
+.attBtnA  { border-color: #ef4444; color: #ef4444; }
+.attBtnE  { border-color: #8b5cf6; color: #8b5cf6; }
+
+.attBtnPActive { border-color: #22c55e; background: #22c55e; color: white; }
+.attBtnLActive { border-color: #f59e0b; background: #f59e0b; color: white; }
+.attBtnAActive { border-color: #ef4444; background: #ef4444; color: white; }
+.attBtnEActive { border-color: #8b5cf6; background: #8b5cf6; color: white; }
+
 .studentCard {
   display: flex !important;
-  flex-direction: row !important;
-  align-items: center !important;
-  justify-content: space-between !important;
+  flex-direction: column !important;
   padding: 0.625rem 0.75rem !important;
   background: #f8fafc;
   border-radius: 14px;

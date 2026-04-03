@@ -19,7 +19,63 @@ import {
 import styles from './StaffProfile.module.css';
 
 // API base URL - use environment variable or fallback to localhost
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5011/api';
+
+// Inline component to create mark list when not found
+const MarkListCreateInline = ({ subject, className, term, onCreated }) => {
+  const [components, setComponents] = useState([
+    { name: 'Mid', percentage: 30 },
+    { name: 'Test', percentage: 10 },
+    { name: 'Conduct', percentage: 10 },
+    { name: 'Exercise', percentage: 10 },
+    { name: 'Final', percentage: 40 }
+  ]);
+  const [loading, setLoading] = useState(false);
+  const [msg, setMsg] = useState('');
+
+  const total = components.reduce((s, c) => s + (c.percentage || 0), 0);
+
+  const handleCreate = async () => {
+    if (total !== 100) return setMsg('Total must be 100%');
+    setLoading(true);
+    try {
+      const res = await fetch(`https://bilal.skoolific.com/api/mark-list/create-mark-forms`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subjectName: subject, className, termNumber: term, markComponents: components })
+      });
+      const data = await res.json();
+      if (res.ok) { onCreated(); }
+      else setMsg(data.error || 'Failed');
+    } catch (e) { setMsg(e.message); }
+    finally { setLoading(false); }
+  };
+
+  return (
+    <div style={{marginTop:'1rem',padding:'1rem',background:'#f8faff',borderRadius:'12px',border:'1.5px solid #e0e7ff'}}>
+      <h4 style={{margin:'0 0 0.75rem',color:'#4f46e5',fontSize:'0.9rem'}}>Mark Components Configuration</h4>
+      {components.map((c, i) => (
+        <div key={i} style={{display:'flex',gap:'0.5rem',marginBottom:'0.5rem',alignItems:'center'}}>
+          <input value={c.name} onChange={e => { const n=[...components]; n[i].name=e.target.value; setComponents(n); }}
+            style={{flex:1,padding:'0.4rem 0.6rem',borderRadius:'8px',border:'1px solid #cbd5e1',fontSize:'0.82rem'}} placeholder="Name"/>
+          <input type="number" value={c.percentage} onChange={e => { const n=[...components]; n[i].percentage=parseInt(e.target.value)||0; setComponents(n); }}
+            style={{width:'60px',padding:'0.4rem',borderRadius:'8px',border:'1px solid #cbd5e1',fontSize:'0.82rem',textAlign:'center'}} min="0" max="100"/>
+          <span style={{fontSize:'0.8rem',color:'#64748b'}}>%</span>
+          {components.length > 1 && <button onClick={() => setComponents(components.filter((_,j)=>j!==i))} style={{background:'none',border:'none',color:'#ef4444',cursor:'pointer',fontSize:'1rem'}}>×</button>}
+        </div>
+      ))}
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginTop:'0.5rem'}}>
+        <button onClick={() => setComponents([...components,{name:'',percentage:0}])} style={{background:'none',border:'1px dashed #6366f1',color:'#6366f1',borderRadius:'8px',padding:'0.3rem 0.75rem',cursor:'pointer',fontSize:'0.8rem'}}>+ Add</button>
+        <span style={{fontSize:'0.82rem',color:total===100?'#16a34a':'#ef4444',fontWeight:600}}>Total: {total}%</span>
+      </div>
+      {msg && <p style={{color:'#ef4444',fontSize:'0.8rem',margin:'0.5rem 0 0'}}>{msg}</p>}
+      <button onClick={handleCreate} disabled={loading||total!==100}
+        style={{marginTop:'0.75rem',width:'100%',padding:'0.6rem',background:total===100?'#4f46e5':'#cbd5e1',color:'white',border:'none',borderRadius:'10px',fontWeight:600,cursor:total===100?'pointer':'not-allowed',fontSize:'0.85rem'}}>
+        {loading ? 'Creating...' : 'Create Mark List'}
+      </button>
+    </div>
+  );
+};
 
 const StaffProfile = () => {
   const [user, setUser] = useState(null);
@@ -824,10 +880,21 @@ const StaffProfile = () => {
     }
   }, [selectedWeek, assignedClass, isClassTeacher]);
 
-  // Fetch Ethiopian today and build week dates
+  // Fetch Ethiopian today from API (same as admin) and build week dates
   useEffect(() => {
-    const ethToday = convertToEthiopian(new Date());
-    setEthiopianToday(ethToday);
+    const fetchEthiopianToday = async () => {
+      try {
+        const res = await axios.get(`${API_BASE_URL}/academic/student-attendance/current-date`);
+        if (res.data.success) {
+          setEthiopianToday(res.data.data);
+        } else {
+          setEthiopianToday(convertToEthiopian(new Date()));
+        }
+      } catch {
+        setEthiopianToday(convertToEthiopian(new Date()));
+      }
+    };
+    fetchEthiopianToday();
   }, []);
 
   useEffect(() => {
@@ -2155,42 +2222,48 @@ const StaffProfile = () => {
                     const isAdmin = user?.staffType?.toLowerCase() === 'admin';
                     const isLocked = savedMarkStudents.has(student.id) && !isAdmin;
                     return (
-                    <div key={student.id} className={`${styles.mlCard} ${isLocked ? styles.markListStudentLocked : ''}`}>
-                      {/* Row: avatar + name + inputs + save */}
-                      <div className={styles.mlRow}>
-                        <div className={styles.mlAvatar}>{student.student_name?.charAt(0)}</div>
-                        <div className={styles.mlName}>
-                          <span>{student.student_name}</span>
-                          {parseFloat(student.total) > 0 && <span className={styles.mlTotal}>{student.total}%</span>}
-                        </div>
-                        <div className={styles.mlInputs}>
-                          {markListConfig.mark_components.map(component => {
-                            const componentKey = component.name.toLowerCase().replace(/\s+/g, '_');
-                            return (
-                              <div key={component.name} className={styles.mlInputWrap}>
-                                <span className={styles.mlLabel}>{component.name}</span>
-                                <input
-                                  type="number"
-                                  min="0"
-                                  max={component.percentage}
-                                  value={student[componentKey] === '' ? '' : (parseFloat(student[componentKey]) === 0) ? '' : student[componentKey]}
-                                  onChange={(e) => handleMarkListMarkChange(student.id, componentKey, e.target.value)}
-                                  placeholder="0"
-                                  disabled={isLocked}
-                                  className={styles.mlInput}
-                                />
-                              </div>
-                            );
-                          })}
-                        </div>
-                        {isLocked ? (
-                          <span className={styles.mlSaved}><FiCheckCircle size={16} /></span>
-                        ) : (
-                          <button className={styles.mlSaveBtn} onClick={() => saveStudentMarks(student.id)} disabled={savingMarks}>
-                            <FiSave size={15} />
-                          </button>
-                        )}
+                    <div key={student.id} style={{background:'white',borderRadius:'14px',padding:'0.75rem',marginBottom:'0.5rem',boxShadow:'0 2px 8px rgba(99,102,241,0.08)',border:'1.5px solid #e0e7ff'}}>
+                      {/* Name row */}
+                      <div style={{display:'flex',alignItems:'center',gap:'0.5rem',marginBottom:'0.6rem'}}>
+                        <div style={{width:'32px',height:'32px',borderRadius:'50%',background:'linear-gradient(135deg,#6366f1,#8b5cf6)',display:'flex',alignItems:'center',justifyContent:'center',color:'white',fontWeight:700,fontSize:'0.8rem',flexShrink:0}}>{idx+1}</div>
+                        <span style={{fontWeight:600,fontSize:'0.88rem',color:'#1e293b',flex:1}}>{student.student_name}</span>
+                        {parseFloat(student.total) > 0 && <span style={{background:'#f0fdf4',color:'#16a34a',borderRadius:'20px',padding:'0.15rem 0.5rem',fontSize:'0.75rem',fontWeight:700}}>{student.total}%</span>}
                       </div>
+                      {/* Mark dropdowns row */}
+                      <div style={{display:'flex',gap:'0.3rem',flexWrap:'wrap'}}>
+                        {markListConfig.mark_components.map(component => {
+                          const componentKey = component.name.toLowerCase().replace(/\s+/g, '_');
+                          const val = parseFloat(student[componentKey]) || 0;
+                          const max = component.percentage;
+                          const opts = Array.from({length: max+1}, (_,i) => i);
+                          return (
+                            <div key={component.name} style={{display:'flex',flexDirection:'column',alignItems:'center',gap:'0.15rem',flex:1,minWidth:'50px'}}>
+                              <span style={{fontSize:'0.65rem',color:'#64748b',fontWeight:600,textTransform:'uppercase'}}>{component.name}</span>
+                              <input
+                                type="number"
+                                min="0"
+                                max={component.percentage}
+                                value={student[componentKey] === '' ? '' : (parseFloat(student[componentKey]) === 0 ? '' : student[componentKey])}
+                                onChange={(e) => handleMarkListMarkChange(student.id, componentKey, e.target.value)}
+                                disabled={isLocked}
+                                placeholder="0"
+                                style={{width:'100%',padding:'0.3rem 0.2rem',borderRadius:'8px',border:'1.5px solid',borderColor:parseFloat(student[componentKey])>0?'#6366f1':'#e2e8f0',background:parseFloat(student[componentKey])>0?'#eef2ff':'white',color:'#1e293b',fontSize:'0.82rem',fontWeight:600,textAlign:'center',outline:'none'}}
+                              />
+                              <span style={{fontSize:'0.6rem',color:'#94a3b8'}}>/{component.percentage}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                      {/* Save button */}
+                      {!isLocked && (
+                        <button onClick={() => saveStudentMarks(student.id)} disabled={savingMarks}
+                          style={{marginTop:'0.5rem',width:'100%',padding:'0.35rem',background:'#6366f1',color:'white',border:'none',borderRadius:'8px',fontWeight:600,fontSize:'0.75rem',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:'0.25rem'}}>
+                          <FiSave size={12}/> Save
+                        </button>
+                      )}
+                      {isLocked && (
+                        <div style={{marginTop:'0.4rem',textAlign:'center',color:'#16a34a',fontSize:'0.75rem',fontWeight:600}}>✓ Saved</div>
+                      )}
                     </div>
                     );
                   })}
@@ -2200,6 +2273,16 @@ const StaffProfile = () => {
 
             {markListMessage && (
               <div className={styles.markListMessage}>{markListMessage}</div>
+            )}
+
+            {/* Mark list not found - show create option */}
+            {!markListLoading && markListData.length === 0 && markListMessage && selectedMarkListSubject && selectedMarkListClass && (
+              <MarkListCreateInline
+                subject={selectedMarkListSubject}
+                className={selectedMarkListClass}
+                term={selectedMarkListTerm}
+                onCreated={() => { setMarkListMessage(''); loadMarkListData(); }}
+              />
             )}
           </>
         )}
@@ -2362,7 +2445,7 @@ const StaffProfile = () => {
         </div>
 
         {/* Students List */}
-        <div className={styles.studentsSection}>
+        <div className={styles.studentsSection} style={{padding:'1rem 0.75rem'}}>
           <div className={styles.sectionHeader}>
             <h3><FiUsers size={18} /> Students List</h3>
             <span className={styles.badge}>{students.length} students</span>
@@ -2385,53 +2468,40 @@ const StaffProfile = () => {
               <p>There are no students in {assignedClass || 'this class'}</p>
             </div>
           ) : (
-            <div className={styles.studentsList}>
+            <div style={{display:'flex',flexDirection:'column',gap:'0.5rem',padding:'0 0.25rem'}}>
               {students.map((student, index) => {
                 const status = getStudentStatus(student);
+                const num = index + 1;
                 return (
-                  <div key={student.student_id || index} className={styles.studentCard} style={{ display: 'flex', flexDirection: 'row', flexWrap: 'nowrap', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem', padding: '0.5rem 0.625rem' }}>
-                    <div className={styles.studentInfo} style={{ flex: '1', minWidth: 0, overflow: 'hidden' }}>
-                      <div className={styles.studentAvatar} style={{ width: '36px', height: '36px', flexShrink: 0 }}>
-                        {student.image_student ? (
-                          <img
-                            src={`${API_BASE_URL.replace('/api', '')}/uploads/${student.image_student}`}
-                            alt={student.student_name}
-                            onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
-                          />
-                        ) : null}
-                        <div className={styles.avatarFallback} style={{ display: student.image_student ? 'none' : 'flex' }}>
-                          {student.student_name?.charAt(0) || 'S'}
-                        </div>
-                      </div>
-                      <div className={styles.studentDetails} style={{ minWidth: 0 }}>
-                        <h4 style={{ margin: 0, fontSize: '0.82rem', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{student.student_name}</h4>
-                        <span className={styles.metaItem} style={{ fontSize: '0.7rem' }}>ID: {student.class_id || student.student_id}</span>
-                      </div>
+                  <div key={student.student_id || index} style={{display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'space-between',padding:'0.6rem 0.8rem',background:'linear-gradient(135deg,#f8faff,#f0f4ff)',borderRadius:'14px',border:'1.5px solid #e0e7ff',gap:'0.75rem',boxShadow:'0 1px 4px rgba(99,102,241,0.08)'}}>
+                    <div style={{display:'flex',alignItems:'center',gap:'0.5rem',flex:1,minWidth:0}}>
+                      <div style={{width:'28px',height:'28px',borderRadius:'50%',background:'linear-gradient(135deg,#6366f1,#8b5cf6)',display:'flex',alignItems:'center',justifyContent:'center',color:'white',fontSize:'0.7rem',fontWeight:700,flexShrink:0}}>{num}</div>
+                      <span style={{fontSize:'0.84rem',fontWeight:600,color:'#1e293b',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',textShadow:'none',WebkitTextFillColor:'#1e293b'}}>{student.student_name}</span>
                     </div>
-
-                    {/* Inline mark buttons */}
-                    <div className={styles.inlineMarkBtns} style={{ display: 'flex', flexDirection: 'row', flexShrink: 0, gap: '0.3rem' }}>
-                      <button
-                        className={`${styles.markBtn} ${styles.markBtnP} ${status === 'P' ? styles.markBtnActive : ''}`}
-                        style={{ width: '32px', height: '32px', fontSize: '0.8rem', borderRadius: '8px', flexShrink: 0 }}
-                        onClick={() => markStudent(student, status === 'P' ? '' : 'P')}
-                      >✓</button>
-                      <button
-                        className={`${styles.markBtn} ${styles.markBtnL} ${status === 'L' ? styles.markBtnActive : ''}`}
-                        style={{ width: '32px', height: '32px', fontSize: '0.8rem', borderRadius: '8px', flexShrink: 0 }}
-                        onClick={() => markStudent(student, status === 'L' ? '' : 'L')}
-                      >⏰</button>
-                      <button
-                        className={`${styles.markBtn} ${styles.markBtnA} ${status === 'A' ? styles.markBtnActive : ''}`}
-                        style={{ width: '32px', height: '32px', fontSize: '0.8rem', borderRadius: '8px', flexShrink: 0 }}
-                        onClick={() => markStudent(student, status === 'A' ? '' : 'A')}
-                      >✗</button>
-                      <button
-                        className={`${styles.markBtn} ${styles.markBtnE} ${status === 'E' ? styles.markBtnActive : ''}`}
-                        style={{ width: '32px', height: '32px', fontSize: '0.8rem', borderRadius: '8px', flexShrink: 0 }}
-                        onClick={() => markStudent(student, status === 'E' ? '' : 'E')}
-                      >F</button>
-                    </div>
+                    <select
+                      value={status || ''}
+                      onChange={(e) => markStudent(student, e.target.value)}
+                      style={{
+                        flexShrink:0,
+                        padding:'0.3rem 0.5rem',
+                        borderRadius:'8px',
+                        border:'1.5px solid',
+                        borderColor: status==='P'?'#22c55e':status==='L'?'#f59e0b':status==='A'?'#ef4444':status==='E'?'#8b5cf6':'#cbd5e1',
+                        background: status==='P'?'#dcfce7':status==='L'?'#fef3c7':status==='A'?'#fee2e2':status==='E'?'#ede9fe':'white',
+                        color: status==='P'?'#16a34a':status==='L'?'#d97706':status==='A'?'#dc2626':status==='E'?'#7c3aed':'#64748b',
+                        fontSize:'0.78rem',
+                        fontWeight:600,
+                        cursor:'pointer',
+                        outline:'none',
+                        minWidth:'90px'
+                      }}
+                    >
+                      <option value=''>— Select —</option>
+                      <option value='P'>✓ Present</option>
+                      <option value='L'>⏰ Late</option>
+                      <option value='A'>✗ Absent</option>
+                      <option value='E'>F Excuse</option>
+                    </select>
                   </div>
                 );
               })}

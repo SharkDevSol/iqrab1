@@ -108,25 +108,68 @@ const MarkListView = () => {
     fetchMarks();
   }, [selectedClass, selectedSubject, selectedTerm, viewMode]);
 
-  // Fetch comprehensive class ranking with all subjects
+  // Build ranking client-side by fetching each subject's marks
   useEffect(() => {
-    if (!selectedClass || !selectedTerm || viewMode !== 'ranking') return;
+    if (!selectedClass || !selectedTerm || viewMode !== 'ranking' || subjects.length === 0) return;
     const fetchRanking = async () => {
       setLoadingMarks(true);
       try {
-        const response = await axios.get(
-          `${API_BASE_URL}/mark-list/comprehensive-ranking/${selectedClass}/${selectedTerm}`
+        // Fetch marks for all subjects in parallel
+        const results = await Promise.all(
+          subjects.map((sub) =>
+            axios
+              .get(`${API_BASE_URL}/mark-list/mark-list/${encodeURIComponent(sub.subject_name)}/${encodeURIComponent(selectedClass)}/${selectedTerm}`)
+              .then((r) => ({ subject: sub.subject_name, data: r.data }))
+              .catch(() => ({ subject: sub.subject_name, data: null }))
+          )
         );
-        setRankingData(response.data);
+
+        const studentMap = {};
+        const subjectNames = [];
+
+        for (const { subject, data } of results) {
+          if (!data?.markList?.length) continue;
+          subjectNames.push(subject);
+          for (const row of data.markList) {
+            const name = row.student_name;
+            if (!studentMap[name]) {
+              studentMap[name] = { studentName: name, subjects: {}, totalMarks: 0, subjectCount: 0, passedSubjects: 0, failedSubjects: 0 };
+            }
+            const total = Math.min(row.total || 0, 100);
+            studentMap[name].subjects[subject] = { total, status: row.pass_status || 'Fail' };
+            studentMap[name].totalMarks += total;
+            studentMap[name].subjectCount++;
+            row.pass_status === 'Pass' ? studentMap[name].passedSubjects++ : studentMap[name].failedSubjects++;
+          }
+        }
+
+        const rankings = Object.values(studentMap)
+          .map((s) => ({
+            ...s,
+            average: s.subjectCount > 0 ? s.totalMarks / s.subjectCount : 0,
+            overallStatus: s.failedSubjects === 0 && s.subjectCount > 0 ? 'Pass' : 'Fail',
+          }))
+          .sort((a, b) => b.average - a.average)
+          .map((s, i) => ({ ...s, rank: i + 1 }));
+
+        setRankingData({
+          rankings,
+          subjects: subjectNames,
+          summary: {
+            totalStudents: rankings.length,
+            averageClassScore: rankings.length > 0 ? rankings.reduce((sum, s) => sum + s.average, 0) / rankings.length : 0,
+            passRate: rankings.length > 0 ? (rankings.filter((s) => s.overallStatus === 'Pass').length / rankings.length) * 100 : 0,
+          },
+        });
       } catch (error) {
-        console.error('Error fetching ranking:', error);
+        console.error('Error building ranking:', error);
         setRankingData(null);
       } finally {
         setLoadingMarks(false);
       }
     };
     fetchRanking();
-  }, [selectedClass, selectedTerm, viewMode]);
+  }, [selectedClass, selectedTerm, viewMode, subjects]);
 
   const calculateGrade = (marks) => {
     if (marks >= 90) return 'A+';

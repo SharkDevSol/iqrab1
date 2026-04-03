@@ -16,8 +16,8 @@ const MarkListForm = () => {
   const [selectedClass, setSelectedClass] = useState('');
   const [selectedTerm, setSelectedTerm] = useState(1);
   const [markComponents, setMarkComponents] = useState([
-    { name: 'Mid', percentage: 20 },
-    { name: 'Test', percentage: 20 },
+    { name: 'Mid', percentage: 30 },
+    { name: 'Test', percentage: 10 },
     { name: 'Conduct', percentage: 10 },
     { name: 'Exercise', percentage: 10 },
     { name: 'Final', percentage: 40 }
@@ -64,6 +64,42 @@ const MarkListForm = () => {
       .filter(mapping => mapping.subject_name === selectedSubject)
       .map(mapping => mapping.class_name);
   };
+
+  // Auto-load existing config when subject+class+term selected
+  useEffect(() => {
+    if (!selectedSubject || !selectedClass || !selectedTerm) return;
+    const loadConfig = async () => {
+      try {
+        const response = await fetch(
+          `${API_BASE_URL}/mark-list/mark-list/${selectedSubject}/${selectedClass}/${selectedTerm}`
+        );
+        if (response.ok) {
+          const data = await response.json();
+          if (data.config && data.config.mark_components) {
+            setMarkComponents(data.config.mark_components);
+          }
+          setMarkList(data.markList);
+          setFormConfig(data.config);
+          setViewMode('view');
+        } else {
+          // No existing mark list - reset to default components and show create form
+          setMarkComponents([
+            { name: 'Mid', percentage: 30 },
+            { name: 'Test', percentage: 10 },
+            { name: 'Conduct', percentage: 10 },
+            { name: 'Exercise', percentage: 10 },
+            { name: 'Final', percentage: 40 }
+          ]);
+          setMarkList([]);
+          setFormConfig(null);
+          setViewMode('create');
+        }
+      } catch (error) {
+        console.error('Error loading config:', error);
+      }
+    };
+    loadConfig();
+  }, [selectedSubject, selectedClass, selectedTerm]);
 
   const handleComponentChange = (index, field, value) => {
     const newComponents = [...markComponents];
@@ -145,7 +181,7 @@ const MarkListForm = () => {
     setLoading(true);
     try {
       const response = await fetch(
-        `/api/mark-list/mark-list/${selectedSubject}/${selectedClass}/${selectedTerm}`
+        `${API_BASE_URL}/mark-list/mark-list/${selectedSubject}/${selectedClass}/${selectedTerm}`
       );
       
       if (response.ok) {
@@ -154,7 +190,8 @@ const MarkListForm = () => {
         setFormConfig(data.config);
         setViewMode('view');
       } else {
-        setMessage('Mark list not found for this combination');
+        const errData = await response.json().catch(() => ({}));
+        setMessage(errData.error || 'Mark list not found for this combination');
         setMarkList([]);
         setFormConfig(null);
       }
