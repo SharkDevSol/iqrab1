@@ -272,8 +272,21 @@ router.post('/map-subjects-classes', async (req, res) => {
       )
     `);
     
-    // Clear existing mappings
-    await client.query('DELETE FROM subjects_of_school_schema.subject_class_mappings');
+    // Delete only the mappings that are NOT in the new list (user unchecked them)
+    // First get all existing mappings
+    const existingResult = await client.query(
+      'SELECT subject_name, class_name FROM subjects_of_school_schema.subject_class_mappings'
+    );
+    const newSet = new Set(mappings.map(m => `${m.subjectName}||${m.className}`));
+    for (const row of existingResult.rows) {
+      const key = `${row.subject_name}||${row.class_name}`;
+      if (!newSet.has(key)) {
+        await client.query(
+          'DELETE FROM subjects_of_school_schema.subject_class_mappings WHERE subject_name=$1 AND class_name=$2',
+          [row.subject_name, row.class_name]
+        );
+      }
+    }
     
     // Validate and insert new mappings
     for (const mapping of mappings) {
