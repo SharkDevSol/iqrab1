@@ -2385,17 +2385,21 @@ const StaffProfile = () => {
               <p>There are no students in {assignedClass || 'this class'}</p>
             </div>
           ) : (
-            <div className={styles.studentsList}>
+            <div style={{display:'flex',flexDirection:'column',gap:'0.5rem',padding:'0 0.25rem'}}>
               {students.map((student, index) => {
                 const status = getStudentStatus(student);
+                const num = index + 1;
                 return (
-                  <div key={student.student_id || index} style={{display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'space-between',padding:'0.5rem 0.75rem',background:'#e0e7ff',borderRadius:'12px',border:'2px solid #6366f1',gap:'0.5rem',marginBottom:'0.5rem'}}>
-                    <b style={{fontSize:'0.85rem',fontWeight:700,color:'#000000',flex:1,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',display:'block'}}>{student.student_name || 'No Name'}</b>
-                    <div style={{display:'flex',gap:'0.25rem',flexShrink:0}}>
-                      <button style={{width:'26px',height:'26px',borderRadius:'7px',border:'1.5px solid #22c55e',background:status==='P'?'#22c55e':'white',color:status==='P'?'white':'#22c55e',fontSize:'0.7rem',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}} onClick={() => markStudent(student, status === 'P' ? '' : 'P')}>✓</button>
-                      <button style={{width:'26px',height:'26px',borderRadius:'7px',border:'1.5px solid #f59e0b',background:status==='L'?'#f59e0b':'white',color:status==='L'?'white':'#f59e0b',fontSize:'0.7rem',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}} onClick={() => markStudent(student, status === 'L' ? '' : 'L')}>⏰</button>
-                      <button style={{width:'26px',height:'26px',borderRadius:'7px',border:'1.5px solid #ef4444',background:status==='A'?'#ef4444':'white',color:status==='A'?'white':'#ef4444',fontSize:'0.7rem',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}} onClick={() => markStudent(student, status === 'A' ? '' : 'A')}>✗</button>
-                      <button style={{width:'26px',height:'26px',borderRadius:'7px',border:'1.5px solid #8b5cf6',background:status==='E'?'#8b5cf6':'white',color:status==='E'?'white':'#8b5cf6',fontSize:'0.7rem',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}} onClick={() => markStudent(student, status === 'E' ? '' : 'E')}>F</button>
+                  <div key={student.student_id || index} style={{display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'space-between',padding:'0.6rem 0.8rem',background:'linear-gradient(135deg,#f8faff,#f0f4ff)',borderRadius:'14px',border:'1.5px solid #e0e7ff',gap:'0.75rem',boxShadow:'0 1px 4px rgba(99,102,241,0.08)'}}>
+                    <div style={{display:'flex',alignItems:'center',gap:'0.5rem',flex:1,minWidth:0}}>
+                      <div style={{width:'28px',height:'28px',borderRadius:'50%',background:'linear-gradient(135deg,#6366f1,#8b5cf6)',display:'flex',alignItems:'center',justifyContent:'center',color:'white',fontSize:'0.7rem',fontWeight:700,flexShrink:0}}>{num}</div>
+                      <span style={{fontSize:'0.84rem',fontWeight:600,color:'#1e293b',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{student.student_name}</span>
+                    </div>
+                    <div style={{display:'flex',gap:'0.3rem',flexShrink:0}}>
+                      <button style={{width:'30px',height:'30px',borderRadius:'8px',border:'none',background:status==='P'?'#22c55e':'#dcfce7',color:status==='P'?'white':'#16a34a',fontSize:'0.75rem',fontWeight:700,cursor:'pointer'}} onClick={() => markStudent(student, status === 'P' ? '' : 'P')}>✓</button>
+                      <button style={{width:'30px',height:'30px',borderRadius:'8px',border:'none',background:status==='L'?'#f59e0b':'#fef3c7',color:status==='L'?'white':'#d97706',fontSize:'0.75rem',fontWeight:700,cursor:'pointer'}} onClick={() => markStudent(student, status === 'L' ? '' : 'L')}>⏰</button>
+                      <button style={{width:'30px',height:'30px',borderRadius:'8px',border:'none',background:status==='A'?'#ef4444':'#fee2e2',color:status==='A'?'white':'#dc2626',fontSize:'0.75rem',fontWeight:700,cursor:'pointer'}} onClick={() => markStudent(student, status === 'A' ? '' : 'A')}>✗</button>
+                      <button style={{width:'30px',height:'30px',borderRadius:'8px',border:'none',background:status==='E'?'#8b5cf6':'#ede9fe',color:status==='E'?'white':'#7c3aed',fontSize:'0.75rem',fontWeight:700,cursor:'pointer'}} onClick={() => markStudent(student, status === 'E' ? '' : 'E')}>F</button>
                     </div>
                   </div>
                 );
