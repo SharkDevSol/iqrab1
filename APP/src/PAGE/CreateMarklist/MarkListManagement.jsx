@@ -16,8 +16,8 @@ const MarkListForm = () => {
   const [selectedClass, setSelectedClass] = useState('');
   const [selectedTerm, setSelectedTerm] = useState(1);
   const [markComponents, setMarkComponents] = useState([
-    { name: 'Mid', percentage: 20 },
-    { name: 'Test', percentage: 20 },
+    { name: 'Mid', percentage: 30 },
+    { name: 'Test', percentage: 10 },
     { name: 'Conduct', percentage: 10 },
     { name: 'Exercise', percentage: 10 },
     { name: 'Final', percentage: 40 }
@@ -84,8 +84,8 @@ const MarkListForm = () => {
         } else {
           // No existing mark list - reset to default components and show create form
           setMarkComponents([
-            { name: 'Mid', percentage: 20 },
-            { name: 'Test', percentage: 20 },
+            { name: 'Mid', percentage: 30 },
+            { name: 'Test', percentage: 10 },
             { name: 'Conduct', percentage: 10 },
             { name: 'Exercise', percentage: 10 },
             { name: 'Final', percentage: 40 }
