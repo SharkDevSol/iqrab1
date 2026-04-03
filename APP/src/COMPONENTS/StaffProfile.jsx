@@ -2389,28 +2389,26 @@ const StaffProfile = () => {
               {students.map((student, index) => {
                 const status = getStudentStatus(student);
                 return (
-                  <div key={student.student_id || index} className={styles.studentCard} style={{ display: 'flex', flexDirection: 'row', flexWrap: 'nowrap', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem', padding: '0.5rem 0.625rem' }}>
-                    <div className={styles.studentInfo} style={{ flex: '1', minWidth: 0, overflow: 'hidden' }}>
-                      <div className={styles.studentAvatar} style={{ width: '36px', height: '36px', flexShrink: 0 }}>
+                  <div key={student.student_id || index} className={styles.studentCard} style={{ display: 'flex', flexDirection: 'row', flexWrap: 'nowrap', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem', padding: '0.5rem 0.625rem', background: 'white', borderRadius: '12px', marginBottom: '0.5rem', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', border: '2px solid #f0f0f0' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flex: 1, minWidth: 0 }}>
+                      <div style={{ width: '36px', height: '36px', flexShrink: 0, borderRadius: '50%', background: 'linear-gradient(135deg, #6366f1, #4f46e5)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700, fontSize: '0.9rem', overflow: 'hidden' }}>
                         {student.image_student ? (
                           <img
                             src={`${API_BASE_URL.replace('/api', '')}/uploads/${student.image_student}`}
                             alt={student.student_name}
-                            onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
+                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                            onError={(e) => { e.target.style.display = 'none'; }}
                           />
-                        ) : null}
-                        <div className={styles.avatarFallback} style={{ display: student.image_student ? 'none' : 'flex' }}>
-                          {student.student_name?.charAt(0) || 'S'}
-                        </div>
+                        ) : (student.student_name?.charAt(0) || 'S')}
                       </div>
-                      <div className={styles.studentDetails} style={{ minWidth: 0 }}>
-                        <h4 style={{ margin: 0, fontSize: '0.82rem', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{student.student_name}</h4>
-                        <span className={styles.metaItem} style={{ fontSize: '0.7rem' }}>ID: {student.class_id || student.student_id}</span>
+                      <div style={{ minWidth: 0, flex: 1 }}>
+                        <div style={{ fontSize: '0.85rem', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: '#1f2937' }}>{student.student_name}</div>
+                        <div style={{ fontSize: '0.7rem', color: '#9ca3af' }}>ID: {student.class_id || student.student_id}</div>
                       </div>
                     </div>
 
                     {/* Inline mark buttons */}
-                    <div className={styles.inlineMarkBtns} style={{ display: 'flex', flexDirection: 'row', flexShrink: 0, gap: '0.3rem' }}>
+                    <div style={{ display: 'flex', flexDirection: 'row', flexShrink: 0, gap: '0.3rem' }}>
                       <button
                         className={`${styles.markBtn} ${styles.markBtnP} ${status === 'P' ? styles.markBtnActive : ''}`}
                         style={{ width: '32px', height: '32px', fontSize: '0.8rem', borderRadius: '8px', flexShrink: 0 }}
