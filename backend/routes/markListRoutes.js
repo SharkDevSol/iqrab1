@@ -473,7 +473,7 @@ router.post('/create-mark-forms', async (req, res) => {
 
 // Route to get mark list for a specific subject, class, and term
 // Helper: normalize class name for table lookup (G8A → 8a, 8A → 8a)
-const normalizeClassName = (name) => name.toLowerCase().replace(/^g/, '');
+const normalizeClassName = (name) => name.toLowerCase();
 
 router.get('/mark-list/:subjectName/:className/:termNumber', async (req, res) => {
   const { subjectName, termNumber } = req.params;
