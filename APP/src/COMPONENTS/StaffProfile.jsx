@@ -2246,12 +2246,12 @@ const StaffProfile = () => {
                       {/* Save button */}
                       {!isLocked && (
                         <button onClick={() => saveStudentMarks(student.id)} disabled={savingMarks}
-                          style={{marginTop:'0.6rem',width:'100%',padding:'0.4rem',background:'#6366f1',color:'white',border:'none',borderRadius:'8px',fontWeight:600,fontSize:'0.8rem',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:'0.3rem'}}>
-                          <FiSave size={13}/> Save
+                          style={{marginTop:'0.5rem',width:'100%',padding:'0.35rem',background:'#6366f1',color:'white',border:'none',borderRadius:'8px',fontWeight:600,fontSize:'0.75rem',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:'0.25rem'}}>
+                          <FiSave size={12}/> Save
                         </button>
                       )}
                       {isLocked && (
-                        <div style={{marginTop:'0.5rem',textAlign:'center',color:'#16a34a',fontSize:'0.78rem',fontWeight:600}}>✓ Saved</div>
+                        <div style={{marginTop:'0.4rem',textAlign:'center',color:'#16a34a',fontSize:'0.75rem',fontWeight:600}}>✓ Saved</div>
                       )}
                     </div>
                     );
