@@ -21,6 +21,62 @@ import styles from './StaffProfile.module.css';
 // API base URL - use environment variable or fallback to localhost
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5011/api';
 
+// Inline component to create mark list when not found
+const MarkListCreateInline = ({ subject, className, term, onCreated }) => {
+  const [components, setComponents] = useState([
+    { name: 'Mid', percentage: 30 },
+    { name: 'Test', percentage: 10 },
+    { name: 'Conduct', percentage: 10 },
+    { name: 'Exercise', percentage: 10 },
+    { name: 'Final', percentage: 40 }
+  ]);
+  const [loading, setLoading] = useState(false);
+  const [msg, setMsg] = useState('');
+
+  const total = components.reduce((s, c) => s + (c.percentage || 0), 0);
+
+  const handleCreate = async () => {
+    if (total !== 100) return setMsg('Total must be 100%');
+    setLoading(true);
+    try {
+      const res = await fetch(`https://bilal.skoolific.com/api/mark-list/create-mark-forms`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subjectName: subject, className, termNumber: term, markComponents: components })
+      });
+      const data = await res.json();
+      if (res.ok) { onCreated(); }
+      else setMsg(data.error || 'Failed');
+    } catch (e) { setMsg(e.message); }
+    finally { setLoading(false); }
+  };
+
+  return (
+    <div style={{marginTop:'1rem',padding:'1rem',background:'#f8faff',borderRadius:'12px',border:'1.5px solid #e0e7ff'}}>
+      <h4 style={{margin:'0 0 0.75rem',color:'#4f46e5',fontSize:'0.9rem'}}>Mark Components Configuration</h4>
+      {components.map((c, i) => (
+        <div key={i} style={{display:'flex',gap:'0.5rem',marginBottom:'0.5rem',alignItems:'center'}}>
+          <input value={c.name} onChange={e => { const n=[...components]; n[i].name=e.target.value; setComponents(n); }}
+            style={{flex:1,padding:'0.4rem 0.6rem',borderRadius:'8px',border:'1px solid #cbd5e1',fontSize:'0.82rem'}} placeholder="Name"/>
+          <input type="number" value={c.percentage} onChange={e => { const n=[...components]; n[i].percentage=parseInt(e.target.value)||0; setComponents(n); }}
+            style={{width:'60px',padding:'0.4rem',borderRadius:'8px',border:'1px solid #cbd5e1',fontSize:'0.82rem',textAlign:'center'}} min="0" max="100"/>
+          <span style={{fontSize:'0.8rem',color:'#64748b'}}>%</span>
+          {components.length > 1 && <button onClick={() => setComponents(components.filter((_,j)=>j!==i))} style={{background:'none',border:'none',color:'#ef4444',cursor:'pointer',fontSize:'1rem'}}>×</button>}
+        </div>
+      ))}
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginTop:'0.5rem'}}>
+        <button onClick={() => setComponents([...components,{name:'',percentage:0}])} style={{background:'none',border:'1px dashed #6366f1',color:'#6366f1',borderRadius:'8px',padding:'0.3rem 0.75rem',cursor:'pointer',fontSize:'0.8rem'}}>+ Add</button>
+        <span style={{fontSize:'0.82rem',color:total===100?'#16a34a':'#ef4444',fontWeight:600}}>Total: {total}%</span>
+      </div>
+      {msg && <p style={{color:'#ef4444',fontSize:'0.8rem',margin:'0.5rem 0 0'}}>{msg}</p>}
+      <button onClick={handleCreate} disabled={loading||total!==100}
+        style={{marginTop:'0.75rem',width:'100%',padding:'0.6rem',background:total===100?'#4f46e5':'#cbd5e1',color:'white',border:'none',borderRadius:'10px',fontWeight:600,cursor:total===100?'pointer':'not-allowed',fontSize:'0.85rem'}}>
+        {loading ? 'Creating...' : 'Create Mark List'}
+      </button>
+    </div>
+  );
+};
+
 const StaffProfile = () => {
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
@@ -2200,6 +2256,16 @@ const StaffProfile = () => {
 
             {markListMessage && (
               <div className={styles.markListMessage}>{markListMessage}</div>
+            )}
+
+            {/* Mark list not found - show create option */}
+            {!markListLoading && markListData.length === 0 && markListMessage && selectedMarkListSubject && selectedMarkListClass && (
+              <MarkListCreateInline
+                subject={selectedMarkListSubject}
+                className={selectedMarkListClass}
+                term={selectedMarkListTerm}
+                onCreated={() => { setMarkListMessage(''); loadMarkListData(); }}
+              />
             )}
           </>
         )}
